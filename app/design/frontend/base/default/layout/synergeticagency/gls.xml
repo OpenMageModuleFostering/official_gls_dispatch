@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <checkout_onepage_index>
+        <reference name="form.additional.info">
+            <block type="synergeticagency_gls/checkout_onepage_parcelshop" name="gls.checkout.onepage.billing.extra.parcelshop" template="gls/checkout/onepage/billing_form_additional_parcelshop.phtml" />
+        </reference>
+        <reference name="checkout.onepage.shipping">
+            <action method="setTemplate"><template>gls/checkout/onepage/shipping.phtml</template></action>
+            <block type="checkout/onepage_shipping" name="checkout.onepage.shipping.original" as="shipping_original" template="checkout/onepage/shipping.phtml"/>
+            <block type="synergeticagency_gls/checkout_onepage_parcelshop" name="gls.checkout.onepage.shipping.parcelshop" as="gls_shipping_parcelshop" template="gls/checkout/onepage/shipping_parcelshop.phtml" />
+        </reference>
+        <reference name="head">
+            <action ifconfig="gls/parcel_shop/parcel_shop_enabled" method="addJs">
+                <script>gls/frontend.js</script>
+            </action>
+        </reference>
+        <reference name="head">
+            <action ifconfig="gls/parcel_shop/parcel_shop_css_enabled" method="addCss">
+                <script>css/gls/frontend.css</script>
+            </action>
+        </reference>
+    </checkout_onepage_index>
+    <synergeticagency_gls_frontend_parcelshopmap>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/popup.phtml</template>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="synergeticagency_gls/checkout_onepage_parcelshop_map" name="gls.checkout.onepage.parcelshop.map" template="gls/checkout/onepage/parcelshop/map.phtml"/>
+        </reference>
+    </synergeticagency_gls_frontend_parcelshopmap>
+</layout>

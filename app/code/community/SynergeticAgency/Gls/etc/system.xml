@@ -1,0 +1,700 @@
+<?xml version="1.0"?>
+<config>
+    <sections>
+        <gls translate="label"  module="synergeticagency_gls">
+            <label>GLS</label>
+            <tab>sales</tab>
+            <sort_order>325</sort_order>
+            <frontend_type>text</frontend_type>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <note>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <label>GLS</label>
+                    <frontend_type>text</frontend_type>
+                    <frontend_model>synergeticagency_gls/adminhtml_system_config_note</frontend_model>
+                    <support_url>https://gls-group.eu/DE/de/kontakt</support_url>
+                    <agency_url>https://gls-group.eu/DE/de/home</agency_url>
+                    <sort_order>0</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                </note>
+                <general translate="label comment" module="synergeticagency_gls">
+                    <label>Basic configuration</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <expanded>1</expanded>
+                    <fields>
+                        <active translate="label comment" module="synergeticagency_gls">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <!--
+                        <sandbox translate="label comment">
+                            <label>Sandbox-Mode</label>
+                            <comment><![CDATA[In Sandbox-Mode, the so called TEST-flag will be sent to GLS. No Labels and all other processes have an productive effect. Use the test mode in your development- or test-systems.]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </sandbox>
+                        -->
+                        <logging_enabled translate="label comment">
+                            <label>Log requests and responses of the GLS API</label>
+                            <comment><![CDATA[Please ensure that the Magento-Log is activated. It will be logged into Magento's system.log]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </logging_enabled>
+                        <debug_enabled translate="label comment">
+                            <label>Debug mode</label>
+                            <comment><![CDATA[In debug mode all relevant processes are logged. Attention, the log file can become very large in debug mode! It will be logged into SynergeticAgency_Gls.log and/or SynergeticAgency_GlsApi.log]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </debug_enabled>
+                        <connector_log_enabled translate="label comment">
+                            <label>Connector Logging</label>
+                            <comment><![CDATA[When enabled, additional Connector debug information will be written into a Connector Logfile (SynergeticAgency_GlsApi.log). Attention, the log file can become very large!]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>135</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </connector_log_enabled>
+                        <api_url translate="label comment">
+                            <label>GLS-API URL</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[This URL should not be changed by default.]]></comment>
+                            <validate>validate-url</validate>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </api_url>
+                        <json_url translate="label comment">
+                            <label>GLS-JSON-Config URL</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[This URL should not be changed by default.]]></comment>
+                            <validate>validate-url</validate>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </json_url>
+                        <tracking_url translate="label comment">
+                            <label>GLS tracking URL</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[This URL should not be changed by default.]]></comment>
+                            <validate>validate-url</validate>
+                            <sort_order>160</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </tracking_url>
+                        <apiAuthUsername translate="label comment">
+                            <label>GLS-API Username</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[The GLS-API HTTP-Authentication-Username]]></comment>
+                            <sort_order>170</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </apiAuthUsername>
+                        <apiAuthPassword translate="label comment">
+                            <label>GLS-API Password</label>
+                            <frontend_type>obscure</frontend_type>
+                            <comment><![CDATA[The GLS-API HTTP-Authentication-Password]]></comment>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <sort_order>180</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </apiAuthPassword>
+                        <customer_id translate="label comment">
+                            <label>GLS customer ID</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[GLS customer ID. For details see manual.]]></comment>
+                            <sort_order>190</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </customer_id>
+                        <contact_id translate="label comment">
+                            <label>GLS contact ID</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[GLS contact ID. For details see manual.]]></comment>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </contact_id>
+                    </fields>
+                </general>
+                <shipment translate="label comment" module="synergeticagency_gls">
+                    <label>Shipment options</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <weight translate="label comment">
+                            <label>Default weight</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number</validate>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>kilogram (kg)</comment>
+                        </weight>
+                        <default_combination translate="label comment">
+                            <label>Default GLS product</label>
+                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[For international shipment EuroBusinessParcel is chosen by default. Default product is only selected when the possibility is given.]]></comment>
+                            <source_model>synergeticagency_gls/system_config_source_product</source_model>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </default_combination>
+                        <default_services translate="label comment">
+                            <label>Default GLS services</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <comment><![CDATA[Service gets only selected when combination is available.]]></comment>
+                            <source_model>synergeticagency_gls/system_config_source_service</source_model>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </default_services>
+                        <return_label_enabled translate="label comment">
+                            <label>Create return label</label>
+                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[Service gets only selected when combination is available.]]></comment>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </return_label_enabled>
+                        <labelsize translate="label comment">
+                            <label>Label Size</label>
+                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[Please note that not all label sizes are supported in some circumstances. Default is 'A6'. For details see manual.]]></comment>
+                            <source_model>synergeticagency_gls/system_config_source_labelsize</source_model>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </labelsize>
+                    </fields>
+                </shipment>
+                <alternative_shipper translate="label comment" module="synergeticagency_gls">
+                    <label>Alternative shipper data</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>40</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <alternative_shipper_enabled translate="label comment">
+                            <label>Alternative shipper enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </alternative_shipper_enabled>
+                        <name1 translate="label comment">
+                            <label>Name 1</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name1>
+                        <name2 translate="label comment">
+                            <label>Name 2</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name2>
+                        <name3 translate="label comment">
+                            <label>Name 3</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name3>
+                        <street1 translate="label comment">
+                            <label>Street</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </street1>
+                        <country translate="label comment">
+                            <label>Country</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>synergeticagency_gls/system_config_source_country</source_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </country>
+                        <zip_code translate="label comment">
+                            <label>ZIP code</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-10</validate>
+                            <sort_order>160</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </zip_code>
+                        <city translate="label comment">
+                            <label>City</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>170</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </city>
+                    </fields>
+                </alternative_shipper>
+                <return_address translate="label comment" module="synergeticagency_gls">
+                    <label>Return address data</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>40</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <comment>This address is mandatory for return labels</comment>
+                    <fields>
+                        <name1 translate="label comment">
+                            <label>Name 1</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name1>
+                        <name2 translate="label comment">
+                            <label>Name 2</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name2>
+                        <name3 translate="label comment">
+                            <label>Name 3</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name3>
+                        <street1 translate="label comment">
+                            <label>Street</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </street1>
+                        <country translate="label comment">
+                            <label>Country</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>synergeticagency_gls/system_config_source_country</source_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </country>
+                        <zip_code translate="label comment">
+                            <label>ZIP code</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-10</validate>
+                            <sort_order>160</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </zip_code>
+                        <city translate="label comment">
+                            <label>City</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-length maximum-length-40</validate>
+                            <sort_order>170</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </city>
+                    </fields>
+                </return_address>
+                <parcel_shop translate="label comment" module="synergeticagency_gls">
+                    <label>GLS ParcelShop</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>50</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <parcel_shop_enabled translate="label comment">
+                            <label>GLS ParcelShop enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </parcel_shop_enabled>
+                        <parcel_shop_url translate="label comment">
+                            <label>URL for GLS ParcelShop Service</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[This URL should not be changed by default.]]></comment>
+                            <validate>validate-url</validate>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </parcel_shop_url>
+                    </fields>
+                </parcel_shop>
+            </groups>
+        </gls>
+        <carriers>
+            <groups>
+                <synergeticagency_gls translate="label">
+                    <label>GLS</label>
+                    <sort_order>4</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <gls_general_label translate="label" module="synergeticagency_gls">
+                            <label>General</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                        </gls_general_label>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </active>
+                        <title translate="label" module="synergeticagency_gls">
+                            <label>Carrier title</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>required-entry</validate>
+                            <sort_order>6</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <showmethod translate="label">
+                            <label>Show Method if Not Applicable</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>8</sort_order>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </showmethod>
+                        <specificerrmsg translate="label">
+                            <label>Displayed Error Message</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>9</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificerrmsg>
+                        <sallowspecific translate="label">
+                            <label>Available for specific countries only</label>
+                            <frontend_type>select</frontend_type>
+                            <frontend_class>shipping-applicable-country</frontend_class>
+                            <source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </sallowspecific>
+                        <specificcountry translate="label">
+                            <label>Ship to Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>12</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </specificcountry>
+                        <label_standard translate="label" module="synergeticagency_gls">
+                            <label>gls_standard_delivery</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                        </label_standard>
+                        <active_standard translate="label" module="synergeticagency_gls">
+                            <label>Active</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </active_standard>
+                        <name_standard translate="label" module="synergeticagency_gls">
+                            <label>Name</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>required-entry</validate>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name_standard>
+                        <show_logo_standard translate="label" module="synergeticagency_gls">
+                            <label>Show gls_logo</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </show_logo_standard>
+                        <price_per_order_standard translate="label" module="synergeticagency_gls">
+                            <label>Price per order</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </price_per_order_standard>
+                        <label_express translate="label" module="synergeticagency_gls">
+                            <label>gls_express_delivery</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>65</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                        </label_express>
+                        <active_express translate="label" module="synergeticagency_gls">
+                            <label>Active</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </active_express>
+                        <name_express translate="label" module="synergeticagency_gls">
+                            <label>Name</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>required-entry</validate>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name_express>
+                        <show_logo_express translate="label" module="synergeticagency_gls">
+                            <label>Show gls_logo</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </show_logo_express>
+                        <price_per_order_express translate="label" module="synergeticagency_gls">
+                            <label>Price per order</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </price_per_order_express>
+                        <label_foreigncountries translate="label" module="synergeticagency_gls">
+                            <label>gls_foreign_countries_delivery</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>145</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                        </label_foreigncountries>
+                        <active_foreigncountries translate="label" module="synergeticagency_gls">
+                            <label>Active</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </active_foreigncountries>
+                        <name_foreigncountries translate="label" module="synergeticagency_gls">
+                            <label>Name</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>required-entry</validate>
+                            <sort_order>160</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name_foreigncountries>
+                        <show_logo_foreigncountries translate="label" module="synergeticagency_gls">
+                            <label>Show gls_logo</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>170</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </show_logo_foreigncountries>
+                        <price_per_order_foreigncountries translate="label" module="synergeticagency_gls">
+                            <label>Price per order</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>180</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </price_per_order_foreigncountries>
+                    </fields>
+                </synergeticagency_gls>
+            </groups>
+        </carriers>
+        <payment>
+            <groups>
+                <glscashondelivery translate="label" module="synergeticagency_gls">
+                    <label>GLS - Cash on delivery</label>
+                    <sort_order>1000</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <sort_order>1</sort_order>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <sort_order>2</sort_order>
+                        </title>
+                        <order_status translate="label">
+                            <label>New Order Status</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_order_status_new</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </order_status>
+                        <instructions translate="label">
+                            <label>Instructions</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>62</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </instructions>
+                        <min_order_total translate="label">
+                            <label>Minimum Order Total</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>98</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </min_order_total>
+                        <max_order_total translate="label">
+                            <label>Maximum Order Total</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>99</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </max_order_total>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </sort_order>
+                        <disallow_delivery_services translate="label" module="synergeticagency_gls">
+                            <label>Disallow certain delivery services</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </disallow_delivery_services>
+                        <disallowed_delivery_services translate="label">
+                            <label>Disallowed delivery services</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>151</sort_order>
+                            <source_model>synergeticagency_gls/system_config_source_payment_shippingmethods</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                            <depends><disallow_delivery_services>1</disallow_delivery_services></depends>
+                        </disallowed_delivery_services>
+                    </fields>
+                </glscashondelivery>
+            </groups>
+        </payment>
+    </sections>
+</config>

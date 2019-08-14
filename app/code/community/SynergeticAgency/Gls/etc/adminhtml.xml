@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <sales>
+            <children>
+                <gls_shipments translate="title" module="synergeticagency_gls">
+                    <title>GLS Shipments</title>
+                    <action>adminhtml/gls_shipment/</action>
+                    <sort_order>35</sort_order>
+                </gls_shipments>
+            </children>
+        </sales>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <sales>
+                        <children>
+                            <gls_shipments translate="title">
+                                <title>GLS Shipments</title>
+                            </gls_shipments>
+                        </children>
+                    </sales>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <gls translate="title" module="synergeticagency_gls">
+                                        <title>GLS Shipments</title>
+                                    </gls>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

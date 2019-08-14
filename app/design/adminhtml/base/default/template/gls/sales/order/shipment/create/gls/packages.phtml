@@ -1,0 +1,539 @@
+<style type="text/css">
+.dynamic-grid, .dynamic-grid tr td {
+    border:0!important;
+    width:40%;
+}
+
+.addParcel img {
+    margin-right:20px;
+
+}
+
+</style>
+<table id="gls-default-parcel" class="dynamic-grid packages-table" cellspacing="0" cellpadding="0">
+    <tr>
+        <th><?php echo $this->__('Weight (in kg)') ?></th>
+        <th>
+            <?php if($this->isCashService()) : ?>
+            <?php echo sprintf($this->__('Cash Amount (in %s)'),$this->getCurrency()) ?>
+            <?php endif; ?>
+        </th>
+    </tr>
+
+    <?php if($this->hasParcels()) : ?>
+        <?php $i=0; ?>
+        <?php foreach($this->getParcels() as $parcel): ?>
+            <tr class="option-row">
+                <td><input class="input-text shipping-weight" type="text" name="shipment[packages][package_<?php echo $i;?>][weight]" value="<?php echo $parcel->getWeight() ?>" /></td>
+                <td>
+                    <input class="input-text cash-service <? echo ($this->isCashService() == true) ? '' : 'disabled'; ?>" <? echo ($this->isCashService() == true) ? '' : 'disabled'; ?> style=" <? echo ($this->isCashService() == true) ? '' : 'display:none'; ?>" type="text" name="shipment[packages][package_<?php echo  $i;?>][cashservice]" value="<?php echo $this->getStore()->roundPrice($parcel->getCashservice()) ?>" />
+                </td>
+                <td class="gls-controls"><a class="addParcel" href=""><img src="<?php echo $this->getSkinUrl('images/icon_btn_add.gif');?>" /></a></td>
+            </tr>
+            <?php $i++;?>
+        <?php endforeach; ?>
+    <?php else : ?>
+    <tr class="option-row">
+        <td><input class="input-text shipping-weight" type="text" name="shipment[packages][package_0][weight]" value="<?php echo $this->getWeight() ?>" /></td>
+        <td>
+            <input class="input-text cash-service <? echo ($this->isCashService() == true) ? '' : 'disabled'; ?>"  <? echo ($this->isCashService() == true) ? '' : 'disabled'; ?> style=" <? echo ($this->isCashService() == true) ? '' : 'display:none'; ?>" type="text" name="shipment[packages][package_0][cashservice]" value="<?php echo $this->getCashAmount() ?>" />
+        </td>
+        <td class="gls-controls"><a class="addParcel" href=""><img src="<?php echo $this->getSkinUrl('images/icon_btn_add.gif');?>" /></a></td>
+    </tr>
+    <?php endif;?>
+</table>
+
+<script type="text/javascript">
+    //<![CDATA[
+
+    var GlsShippingAdmin = Class.create();
+    GlsShippingAdmin.prototype = {
+        initialize: function (options) {
+            var shippingAdmin = this;
+            shippingAdmin.options = Object.extend({
+                config:'',
+                countryConfig: '',
+                isDomestic:0,
+                isParcelShopDelivery:0,
+                parcelShopCombinationId:null,
+                targetCountry:'',
+                defaultCombination:'',
+                defaultServices:'',
+                defaultWeight:0,
+                productControl:$('glsCombinations'),
+                serviceRows:$$('.gls-service-row'),
+                weightMsgContainer:$('gls-weight-msg'),
+                cashMsgContainer:$('gls-cash-msg'),
+                shippingFormFields:$('inner-gls-form'),
+                //just id here no element due to dom ready + magento
+                shippingFormButtonContainerId:'ship_items_container',
+                shippingFormEditButtonId:'save',
+                activeStatusControl:$$('[name="ship_with_gls"]'),
+                priceFormat:'{"pattern":"%s €","precision":2,"requiredPrecision":2,"decimalSymbol":",","groupSymbol":".","groupLength":3,"integerRequired":1}',
+                weightWarning:'Please note the maximum weight',
+                cashWarning:'Please note the maximum cash amount',
+                emptyMsg:'Field can not be empty'
+
+            },options);
+            shippingAdmin.config = shippingAdmin.toJson(shippingAdmin.options.config);
+            shippingAdmin.countryConfig = shippingAdmin.toJson(shippingAdmin.options.countryConfig);
+            shippingAdmin.maxWeight = false;
+            shippingAdmin.maxCash = 0;
+            shippingAdmin.defaultWeight = <?php echo $this->getDefaultWeight();?>;
+            shippingAdmin.currency = 0;
+            shippingAdmin.priceFormat = shippingAdmin.toJson(shippingAdmin.options.priceFormat);
+            shippingAdmin.history = ['shippingFormButton','shippingFormEditButton'];
+            shippingAdmin.isValid = true;
+            shippingAdmin.cashService = false;
+            shippingAdmin.shippingFormEditButton = false;
+
+
+            Event.observe(document, "dom:loaded", function() {
+                shippingAdmin.setShippingFormButton();
+                shippingAdmin.addParcel();
+                shippingAdmin.removeParcel();
+                shippingAdmin.setFormFields(true);
+                shippingAdmin.validateForm();
+
+                /** observe product select **/
+                shippingAdmin.options.productControl.observe('change', function () {
+                    shippingAdmin.setFormFields(false);
+                    shippingAdmin.validateForm();
+                }.bind(this));
+
+                /** observe enable/disable radios **/
+                shippingAdmin.toggleActiveStatus();
+                shippingAdmin.options.activeStatusControl.invoke('on','change',function () {
+                    shippingAdmin.toggleActiveStatus();
+                }.bind(this));
+
+
+
+                /** observe weight inputs **/
+                $('gls-default-parcel').on('change','.shipping-weight', function (event, element) {
+                    shippingAdmin.validateForm();
+                }.bind(this));
+
+                /** observe cash on delivery inputs **/
+                $('gls-default-parcel').on('change','.cash-service', function (event, element) {
+                    shippingAdmin.validateForm();
+                }.bind(this));
+            });
+        },
+
+        /**
+         * figure out which element is the save button ;-/
+         * @return void
+         */
+        setShippingFormButton: function() {
+            var shippingAdmin = this;
+            if($(shippingAdmin.options.shippingFormEditButtonId)){
+                shippingAdmin.shippingFormEditButton = $(shippingAdmin.options.shippingFormEditButtonId);
+            }
+            if($(shippingAdmin.options.shippingFormButtonContainerId)) {
+                if ($(shippingAdmin.options.shippingFormButtonContainerId).select('button')) {
+                    shippingAdmin.shippingFormEditButton = $(shippingAdmin.options.shippingFormButtonContainerId).select('button')[0];
+                }
+            }
+        },
+
+        /**
+         * en- or disable other shipping form controls
+         * @return void
+         */
+        toggleActiveStatus: function() {
+            var shippingAdmin = this;
+
+            if(shippingAdmin.getRadioValue('*[name="' + shippingAdmin.options.activeStatusControl[0].readAttribute('name') + '"]') == 0){
+                $$('.gls-top-control').invoke('hide');
+                shippingAdmin.options.productControl.disabled = true;
+                shippingAdmin.options.shippingFormFields.hide();
+            }
+            else {
+                $$('.gls-top-control').invoke('show');
+                shippingAdmin.options.productControl.removeAttribute('disabled');
+                shippingAdmin.options.shippingFormFields.show();
+            }
+            shippingAdmin.validateForm();
+        },
+
+        validateForm: function() {
+            var shippingAdmin = this;
+            shippingAdmin.isValid = true;
+
+            //it's not gls shipping if active != 1 - ignore everything set valid true
+            if(shippingAdmin.getRadioValue('*[name="' + shippingAdmin.options.activeStatusControl[0].readAttribute('name') + '"]') == 1) {
+                //no product selected set valid false
+                if(shippingAdmin.options.productControl.getValue()) {
+                    shippingAdmin.validateParcelInputs();
+                }
+                else{
+                    shippingAdmin.isValid = false;
+                    //if no product selected remove all max warnings as there is no config
+                    shippingAdmin.removeParcelWarnings();
+                }
+            }
+            else {
+                shippingAdmin.isValid = true;
+            }
+
+            shippingAdmin.setFormSubmitAction();
+        },
+
+        /**
+         * make sure in weight and cash fields are no invalid figures
+         * @return boolean
+         */
+        validateNumber: function(element, max, msg) {
+            var shippingAdmin = this;
+            var isValid = true;
+            var currentValue = parseFloat(element.getValue().replace(/,/g, '.').replace(new RegExp('/'+ shippingAdmin.priceFormat.decimalSymbol +'/g'), '.'));
+            var floatMax = Math.floor(parseFloat(max));
+            if(shippingAdmin.isNaN(currentValue)){
+                currentValue = 0;
+            }
+            if(currentValue <= 0){
+                if(!element.up().select('.warning').length) {
+                    element.up().appendChild(new Element('div', {class: 'error warning'}).update(shippingAdmin.options.emptyMsg));
+                }
+                isValid = false;
+            }
+
+            if(currentValue > floatMax){
+                element.setValue(currentValue.toFixed(2).replace('.', shippingAdmin.priceFormat.decimalSymbol));
+                if(!element.up().select('.warning').length) {
+                    element.up().appendChild(new Element('div', {class: 'error warning'}).update(msg));
+                }
+                else{
+                    element.up().select('.warning')[0].update(msg);
+                }
+                isValid = false;
+            }
+
+            if(isValid == true){
+                element.setValue(currentValue.toFixed(2).replace('.', shippingAdmin.priceFormat.decimalSymbol));
+                if(element.up().select('.warning').length) {
+                    element.up().select('.warning')[0].remove();
+                }
+            }
+            return isValid;
+        },
+
+        /**
+         * add single parcel to list
+         * @return void
+         */
+        addParcel: function() {
+            var shippingAdmin = this;
+
+            if($$(".addParcel").length) {
+                $$(".addParcel")[0].up('.option-row').up().on("click", ".addParcel", function (event, element) {
+                    Event.stop(event);
+                    var defaultRow = $$('.packages-table tr:nth-child(2)')[0];
+                    var copy = Element.clone(defaultRow, true);
+                    var weightFields = $$('.packages-table')[0].up().select('[name^="shipment[packages][package_"]');
+                    var index = 0;
+                    weightFields.each(function (element) {
+                        var string = element.readAttribute('name');
+                        var currentNumber = Math.max.apply(null, string.match(/\d+/g));
+                        if (currentNumber >= index)
+                        {
+                            index = currentNumber + 1;
+                        }
+                    });
+                    if (copy.select('.warning').length) {
+                        copy.select('.warning').each(function (element) {
+                            element.remove();
+                        });
+                    }
+                    copy.select('[name="shipment[packages][package_0][weight]"]')[0].setValue('');
+                    copy.select('[name="shipment[packages][package_0][weight]"]')[0].setAttribute('name', 'shipment[packages][package_' + index + '][weight]');
+                    if (copy.select('[name="shipment[packages][package_0][cashservice]"]').length) {
+                        copy.select('[name="shipment[packages][package_0][cashservice]"]')[0].setValue('');
+                        copy.select('[name="shipment[packages][package_0][cashservice]"]')[0].setAttribute('name', 'shipment[packages][package_' + index + '][cashservice]');
+                    }
+                    defaultRow.up().appendChild(copy);
+                    copy.select('.addParcel')[0].up().appendChild(new Element('a', {
+                        class: 'removeParcel',
+                        href: ''
+                    }).update(new Element('img', {'src': '<?php echo $this->getSkinUrl('images/icon_btn_delete.gif');?>'})));
+
+                });
+            }
+        },
+
+        /**
+         * remove single parcel from list
+         * @return void
+         */
+        removeParcel: function() {
+            if($$(".addParcel").length) {
+                $$(".addParcel")[0].up('.option-row').up().on("click", ".removeParcel", function (event, element) {
+                    Event.stop(event);
+                    element.up('.option-row').remove();
+                });
+            }
+        },
+
+        /**
+         * validate inputs for each parsel
+         * @return void
+         */
+        validateParcelInputs: function() {
+            var shippingAdmin = this;
+            isValid = true;
+
+            $$('.shipping-weight').each(function (element) {
+                if (shippingAdmin.validateNumber(element, shippingAdmin.maxWeight, shippingAdmin.options.weightWarning) == false) {
+                    isValid = false;
+                }
+            });
+
+            if (shippingAdmin.cashService == true) {
+                $$('.cash-service').each(function (element) {
+                    if (shippingAdmin.validateNumber(element, shippingAdmin.maxCash, shippingAdmin.options.cashWarning) == false) {
+                        isValid = false;
+                    }
+                });
+            }
+
+            shippingAdmin.isValid = isValid;
+
+        },
+        removeParcelWarnings: function() {
+            $$('.shipping-weight').each(function (element) {
+                if( element.up().select('.warning').length) {
+                    element.up().select('.warning')[0].remove();
+                }
+            });
+            $$('.cash-service').each(function (element) {
+                if( element.up().select('.warning').length) {
+                    element.up().select('.warning')[0].remove();
+                }
+            });
+        },
+
+        /**
+         * enable/disable form submit (dependent on valid state)
+         * @return void
+         */
+        setFormSubmitAction: function() {
+            var shippingAdmin = this;
+
+            if(shippingAdmin.shippingFormEditButton && shippingAdmin.isValid == false) {
+                if(!shippingAdmin.history.shippingFormEditButton) {
+                    shippingAdmin.history.shippingFormEditButton = shippingAdmin.shippingFormEditButton.readAttribute('onclick');
+                }
+                shippingAdmin.shippingFormEditButton.removeAttribute('onclick');
+            }
+            if(shippingAdmin.shippingFormEditButton && shippingAdmin.isValid == true && shippingAdmin.history.shippingFormEditButton) {
+                shippingAdmin.shippingFormEditButton.setAttribute('onclick', shippingAdmin.history.shippingFormEditButton);
+            }
+        },
+
+        /**
+         * setting the initial values shipping form
+         * @return void
+         */
+        setFormFields: function(init) {
+            var shippingAdmin = this;
+
+            shippingAdmin.hasCashService();
+            shippingAdmin.options.serviceRows.invoke('hide');
+
+            shippingAdmin.setCashServiceField();
+
+            shippingAdmin.options.serviceRows.each(function(row){
+                row.select('.gls-service')[0].setAttribute('disabled', 'disabled');
+            });
+            if(!init) {
+                shippingAdmin.options.serviceRows.each(function(row){
+                    row.select('.gls-service')[0].setValue(0);
+                });
+            }
+            else {
+                shippingAdmin.initForm();
+            }
+
+            if(shippingAdmin.options.productControl.getValue()){
+                shippingAdmin.setServiceOptions();
+
+                //TODO: refactor
+                //revalidate formfields also if form already invalid to show messages for all fields
+                $$('.shipping-weight').each(function(element){
+                    shippingAdmin.validateNumber(element,shippingAdmin.maxWeight,shippingAdmin.options.weightWarning);
+                });
+                if(shippingAdmin.cashService == true) {
+                    $$('.cash-service').each(function (element) {
+                        shippingAdmin.validateNumber(element, shippingAdmin.maxCash, shippingAdmin.options.cashWarning);
+                    });
+                }
+
+            }
+            else {
+                shippingAdmin.options.weightMsgContainer.up().hide();
+            }
+        },
+
+        /**
+         * en/disable cashinput
+         * @return void
+         */
+        setCashServiceField: function(){
+            var shippingAdmin = this;
+
+            if(shippingAdmin.cashService == true){
+                $$('.cash-service').each(function (element) {
+                    element.removeClassName('disabled');
+                    element.removeAttribute('disabled');
+                    element.removeAttribute('style');
+
+                });
+            }
+            else{
+                $$('.cash-service').each(function (element) {
+                    element.addClassName('disabled');
+                    element.setAttribute('disabled','disabled');
+                    element.setAttribute('style', 'display:none');
+                    if(element.up().select('.warning').length) {
+                        element.up().select('.warning')[0].remove();
+                    }
+                });
+            }
+
+        },
+
+        /**
+         * set flag if product has cash service
+         * @return void
+         */
+        hasCashService: function(){
+            var shippingAdmin = this;
+
+            shippingAdmin.countryConfig.options.each(function(obj){
+                if(shippingAdmin.options.productControl.getValue() == obj.combination) {
+                    if(obj.cashservice == true){
+                        shippingAdmin.cashService = true;
+                    }
+                    else{
+                        shippingAdmin.cashService = false;
+                    }
+                }
+            });
+        },
+        /**
+         * set available additional services for selected product (combination)
+         * @return void
+         */
+
+        setServiceOptions: function(){
+            var shippingAdmin = this;
+
+            shippingAdmin.countryConfig.options.each(function(obj){
+                if(shippingAdmin.options.productControl.getValue() == obj.combination){
+
+                    obj.addon_services.each(function(service){
+                        $('service_' + service).show();
+                        $('service_' + service).select('.gls-service')[0].removeAttribute('disabled');
+                    });
+
+                    /** updating max weight and max cash info and validation **/
+                    if(shippingAdmin.options.isDomestic){
+                        shippingAdmin.maxWeight = shippingAdmin.config.domestic.maxweight;
+                        shippingAdmin.maxCash = shippingAdmin.config.domestic.cashmax;
+                        shippingAdmin.currency = shippingAdmin.config.domestic.cashcurrency;
+                        if(shippingAdmin.options.isParcelShopDelivery){
+                            shippingAdmin.maxWeight = shippingAdmin.config.domestic.parcelshopweight;
+                        }
+                    }
+                    else {
+                        if(shippingAdmin.options.targetCountry) {
+                            shippingAdmin.maxWeight = shippingAdmin.config.foreign.countries[shippingAdmin.options.targetCountry].maxweight;
+                            if (shippingAdmin.options.isParcelShopDelivery) {
+                                shippingAdmin.maxWeight = shippingAdmin.config.foreign.countries[shippingAdmin.options.targetCountry].parcelshopweight;
+
+                            }
+                        }
+                    }
+
+                    if(shippingAdmin.options.weightMsgContainer) {
+                        shippingAdmin.options.weightMsgContainer.select('#gls-max-weight')[0].update(shippingAdmin.maxWeight);
+                    }
+                    if(shippingAdmin.options.cashMsgContainer) {
+                        shippingAdmin.options.cashMsgContainer.select('#gls-max-cash')[0].update(shippingAdmin.maxCash);
+                        shippingAdmin.options.cashMsgContainer.select('#gls-cash-currency')[0].update(shippingAdmin.currency);
+                    }
+                    shippingAdmin.options.weightMsgContainer.up().show();
+
+                }
+            });
+        },
+
+        /**
+         * set form status on load
+         * @return String
+         */
+        initForm: function () {
+            var shippingAdmin = this;
+
+            if(shippingAdmin.options.isDomestic == false){
+                $('gls_return_label_no').checked = true;
+                $('gls_return_label_yes').checked = false;
+                $$('*[name="shipment[gls][return_label]"]').each(function(element){
+                    element.setAttribute('disabled', 'disabled');
+                });
+
+            }
+
+            if (!shippingAdmin.options.isParcelShopDelivery) {
+                $$('#glsCombinations option[value="' + shippingAdmin.options.parcelShopCombinationId + '"]')[0].remove();
+            }
+            else {
+                $$('#glsCombinations option').each(function (element) {
+                    var value = element.readAttribute('value');
+                    if(value != shippingAdmin.options.parcelShopCombinationId){
+                        element.remove();
+                    }
+                });
+            }
+            shippingAdmin.options.weightMsgContainer.update(shippingAdmin.options.weightMsgContainer.innerHTML.replace('%s', '<span id="gls-max-weight">' + shippingAdmin.defaultWeight + '</span>'));
+            if (shippingAdmin.options.cashMsgContainer) {
+                shippingAdmin.options.cashMsgContainer.update(shippingAdmin.options.cashMsgContainer.innerHTML.replace('%s', '<span id="gls-max-cash"></span>'));
+                shippingAdmin.options.cashMsgContainer.update(shippingAdmin.options.cashMsgContainer.innerHTML.replace('%d', '<span id="gls-cash-currency">' + shippingAdmin.options.currency + '</span>'));
+            }
+            shippingAdmin.countryConfig.options.each(function(obj){
+                if($$('#glsCombinations option[value="' + obj.combination  + '"]').length){
+                    if(obj.domestic == false && shippingAdmin.options.isDomestic == true){
+                        $$('#glsCombinations option[value="' + obj.combination  + '"]')[0].remove();
+                    }
+                    if(obj.foreign == false && shippingAdmin.options.isDomestic == false){
+                        $$('#glsCombinations option[value="' + obj.combination  + '"]')[0].remove();
+                    }
+                }
+            });
+        },
+
+        /**
+         * parse json...
+         * @return {Object}
+         */
+        toJson: function(obj) {
+            return JSON.parse(obj);
+        },
+
+        /**
+         * get currently checked radio button of radio group
+         * @return String
+         */
+        getRadioValue: function ($elm) {
+            return $$($elm + ':checked').first().value;
+        },
+
+        isNaN: function (o) {
+            return o !== o;
+        }
+
+    }
+
+    //]]>
+</script>

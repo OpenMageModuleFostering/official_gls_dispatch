@@ -1,0 +1,32 @@
+#gls-parcel-shop-information {
+    padding:2%;
+    background:#f4f4f4;
+    width: 365px;
+    margin-bottom:5px;
+}
+#gls-parcel-shop-information:after {
+    content: ".";
+    clear: both;
+    display: block;
+    visibility: hidden;
+    height: 0px;
+}
+
+#gls-parcel-shop-information .gls-label {
+    float:left;
+    width:30%;
+}
+#gls-parcel-shop-information .gls-value {
+    float:left;
+    width:70%;
+}
+#gls-parcel-shop-information .gls-label.name {
+     font-weight:bold;
+     width:100%;
+ }
+#gls-parcel-shop-information .gls-value.name {
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #cccccc;
+    width:100%;
+}

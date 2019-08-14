@@ -1,0 +1,89 @@
+<?php
+/** @var SynergeticAgency_Gls_model_Shipment $_glsShipment */
+$_glsShipment = $this->getGlsShipment();
+
+if ($_glsShipment && $_glsShipment->getId()):
+    $services = $_glsShipment->getServices(true);
+    $serviceNames = array();
+    foreach($services as $service) {
+        $serviceNames[] = $service->getName();
+    }
+    ?>
+<h3><?php echo $this->__('GLS Shipment');?></h3>
+<div class="field-row grid">
+    <table class="data" cellspacing="0">
+        <col width="40%" />
+        <col width="60%" />
+        <tbody>
+            <tr class="even">
+                <td><?php print $this->__('Shipping option') ?></td>
+                <td><?php echo $_glsShipment->getCombination()->getName() ?></td>
+            </tr>
+            <tr class="odd">
+                <td><?php echo $this->__('Services') ?></td>
+                <td>
+                    <?php if(count($serviceNames)) :
+                        echo implode(', ',$serviceNames);
+                    endif; ?>
+                </td>
+            </tr>
+            <tr class="even">
+                <td><?php print $this->__('Shipping Date') ?></td>
+                <td>
+                    <?php $format = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM);
+                    echo Mage::app()->getLocale()->date(strtotime($_glsShipment->getShippingDate()))->toString($format); ?>
+                </td>
+            </tr>
+            <tr class="odd">
+                <td><?php print $this->__('Sandbox') ?></td>
+                <td><?php echo $_glsShipment->getSandbox() == '1' ? $this->__('Yes') : $this->__('No') ?></td>
+            </tr>
+            <tr class="even">
+                <td><?php print $this->__('Return Label') ?></td>
+                <td><?php echo $_glsShipment->getReturnLabel() == '1' ? $this->__('Yes') : $this->__('No') ?></td>
+            </tr>
+            <tr class="odd">
+                <td><?php print $this->__('GLS Consignment ID') ?></td>
+                <td><?php echo $_glsShipment->getConsignmentId() ?></td>
+            </tr>
+            <tr class="even">
+                <td><strong><?php echo $this->__('Status')?></strong></td>
+                <td><strong><?php echo $_glsShipment->getPrinted() == '1' ? $this->__('Printed') : $this->__('Not printed') ?></strong></td>
+            </tr>
+            <tr class="odd">
+                <td colspan="2">
+                    <?php echo $this->__('Packages') ?>
+                    <table class="data" cellspacing="0">
+                        <?php $i=1; ?>
+                        <tr>
+                            <th><?php echo $this->__('Parcel #');?></th>
+                            <th><?php echo $this->__('Weight (in kg)');?></th>
+                            <th><?php echo sprintf($this->__('Cash Amount (in %s)'),$this->getCurrency()) ?></th>
+                            <th><?php echo $this->__('Parcel Number');?></th>
+                        </tr>
+                        <?php foreach ($_glsShipment->getShipmentParcels() as $parcel) : ?>
+                        <tr>
+                            <td><?php echo $i;?></td>
+                            <td><?php echo $parcel->getWeight();?></td>
+                            <td><?php echo $this->formatPrice($parcel->getCashservice());?></td>
+                            <td><?php echo $parcel->getParcelNumber();?></td>
+                        </tr>
+                        <?php $i++;;?>
+                        <?php endforeach; ?>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<p class="form-buttons">
+    <?php if($_glsShipment->getPrinted() != '1') : ?>
+        <button id="pdf" type="button" class="scalable save" onclick="setLocation('<?php echo $this->getUrl('adminhtml/gls_shipment/print', array('id' => $_glsShipment->getId())); ?>');this.disabled=true;this.className += ' disabled';document.getElementById('edit_gls_shipment').disabled=true;document.getElementById('edit_gls_shipment').className += ' disabled';" style="">
+            <span><?php echo $this->__("PDF") ?></span>
+        </button>
+        <button id="edit_gls_shipment" type="button" class="scalable save" onclick="setLocation('<?php echo $this->getUrl('adminhtml/gls_shipment/edit', array('id' => $_glsShipment->getId())); ?>')" style="">
+            <span><?php echo $this->helper('sales')->__('Edit') ?></span>
+        </button>
+    <?php endif; ?>
+</p>
+<?php endif; ?>

@@ -1,0 +1,193 @@
+<style type="text/css">
+    .gls-selector.fifty {
+        float:left;
+        width:32%;
+        display:block;
+        box-sizing: border-box;
+        margin-right:1%;
+    }
+
+    .gls-selector.fifty.last {
+        width:33%;
+        margin-right:0;
+    }
+    .gls-selector legend {
+        display:block;
+        width: 100%;
+        height: 20px;
+        line-height: 20px;
+        visibility: visible;
+    }
+
+</style>
+
+<div id="gls-form" class="field-row grid">
+    <?php
+    if ($this->isCountryAvailable()) {
+    ?>
+        <h3><?php echo $this->__('GLS shipping')?></h3>
+    <fieldset class="gls-selector fifty first">
+        <legend><?php echo $this->__('Ship with Gls?')?></legend>
+        <input type="radio" name="ship_with_gls" id="ship_with_gls_yes" value="1" checked="checked" />
+        <label for="ship_with_gls_yes"><?php echo $this->__('Yes')?></label>
+        <br />
+        <input type="radio" name="ship_with_gls" id="ship_with_gls_no" value="0"  />
+        <label for="ship_with_gls_no"><?php echo $this->__('No')?></label>
+    </fieldset>
+    <fieldset class="gls-selector gls-top-control fifty">
+        <?php $returnLabel = $this->getReturnLabel();?>
+        <legend><?php echo $this->__('Create Return Label?')?></legend>
+        <input type="radio" name="shipment[gls][return_label]" id="gls_return_label_yes" value="1" <?php echo $returnLabel ? 'checked="checked"' : '';?> />
+        <label for="gls_return_label_yes"><?php echo $this->__('Yes')?></label>
+        <br />
+        <input type="radio" name="shipment[gls][return_label]" id="gls_return_label_no" value="0" <?php echo !$returnLabel ? 'checked="checked"' : '';?> />
+        <label for="gls_return_label_no"><?php echo $this->__('No')?></label>
+    </fieldset>
+    <fieldset class="gls-selector gls-top-control fifty last">
+        <legend><?php echo $this->__('Date to ship the parcel')?></legend>
+        <input name="shipment[gls][shipping_date]" readonly="readonly" id="shipping_date" value="<?php echo $this->getShippingDate();?>" tabindex="1" class="input-text" style="width:110px !important;" type="text"> <img src="<?php echo $this->getSkinUrl('images/grid-cal.gif'); ?>" alt="" class="v-middle" id="date_trig" title="<?php echo $this->__('Select Shipment Date');?>" style="">
+        <script type="text/javascript">
+            //<![CDATA[
+            function disabledDate(date) {
+                var today = new Date();
+                var dd = today.getDate();
+                return date.getDate() < dd ;
+            };
+            Calendar.setup({
+                inputField: "shipping_date",
+                ifFormat: "%d.%m.%Y",
+                showsTime: false,
+                button: "date_trig",
+                align: "Bl",
+                singleClick : true,
+                dateStatusFunc : disabledDate
+            });
+            //]]>
+        </script><small><?php echo $this->__('Select the date the parcel will be shipped');?></small>
+    </fieldset>
+    <div id="inner-gls-form">
+        <table class="data" cellspacing="0" cellpadding="0">
+            <col width="20%" />
+            <col width="40%" />
+            <col width="40%" />
+            <tbody>
+                <tr class="even">            
+                    <td><?php print $this->__('Shipping option') ?></td>
+                    <td colspan="2">
+                        <?php
+                        $readonly = '';
+                        $hiddenField = '';
+                        if($this->isParcelshopDelivery()) {
+                            $readonly = ' disabled="disabled"';
+                            $hiddenField = '<input id="parcelShopOptionId" type="hidden" name="shipment[gls][combination]" value="'.$this->getParcelShopCombinationId().'" />';
+                        }
+                        ?>
+
+                        <select id="glsCombinations" name="shipment[gls][combination]" size="1"<?php echo $readonly;?>>
+                            <?php foreach ($this->getCombinations() as $option): ?>
+                                <?php
+                                $selected = '';
+                                //var_dump($this->isCombinationSelected($option['value']));
+                                if($this->isCombinationSelected($option['value'])) :
+                                    $selected = ' selected="selected"';
+                                endif;
+                                ?>
+                                <option value="<?php echo $option['value']; ?>"<?php echo $selected;?>><?php echo $option['label'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php echo $hiddenField;?>
+                    </td>
+                </tr>
+                <?php $i = 0 ?>
+                <?php foreach($this->getAddonServices() as $service) : ?>
+                <?php
+                $selected = false;
+                if($this->isServiceSelected($service['value'])) :
+                    $selected = true;
+                endif;
+                ?>
+                <tr class="gls-service-row gls-service-<?php echo $service['value']; ?> <?php echo (++$i % 2) ? 'odd' : 'even' ?>" id="service_<?php echo $service['value']; ?>">
+                    <td>
+                        <?php echo $service['label']; ?>
+                    </td>
+                    <td>
+                        <select class="gls-service" name="shipment[gls][service][<?php echo $service['value']; ?>]" size="1">
+                            <option value="1"<?php echo $selected ? ' selected="selected"' : '';?>><?php print $this->__('Yes') ?></option>
+                            <option value="0"<?php echo !$selected ? ' selected="selected"' : '';?>><?php print $this->__('No') ?></option>
+                        </select>
+                    </td>
+                    <td>
+                        <?php if(!empty($service['notice'])) : ?>
+                        <div class="notice-msg" style="padding-left:35px;min-height: 35px;">
+                            <small>
+                            <?php echo $service['notice']; ?>
+                            </small>
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+
+                <tr class="even">
+                    <td>
+                        <?php print $this->__('Packages') ?>
+                    </td>
+                    <td colspan="2"><?php echo $this->getChildHtml('packages') ?></td>
+                </tr>
+                <tr class="odd">
+                    <td></td>
+                    <td colspan="2">
+                        <div class="notice-msg" style="padding-left:35px;">
+                            <small id="gls-weight-msg">
+                            <?php echo $this->__('Advice')?>:<br/>
+                            <?php echo $this->__('The maximum allowed package weight is %s kg') ?>
+                            </small>
+                        </div>
+                        <?php if($this->isCashService()) : ?>
+                        <div class="notice-msg" style="padding-left:35px;">
+                            <small id="gls-cash-msg">
+                                <?php echo $this->__('Advice')?>:<br/>
+                                <?php echo $this->__('The maximum allowed cash amount is %s %d') ?>
+                            </small>
+                        </div>
+                        <?php endif; ?>
+
+                    </td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <?php } else { ?>
+        <p class="notice">
+            <strong><?php echo $this->__('Sorry, this shipment can not be sent using GLS.') ?></strong>
+        </p>
+        <p>
+            <?php echo $this->__('Either your shop origin or the ship to country of this order is not within the supported countries.') ?>
+        </p>
+    <?php } ?>
+</div>
+
+<?php
+if ($this->isCountryAvailable()) : ?>
+<script type="text/javascript">
+//<![CDATA[
+
+var glsShippingAdmin = new GlsShippingAdmin({
+        countryConfig:'<?php echo $this->getCountriesJson();?>',
+        isDomestic:'<?php echo $this->isDomestic(); ?>',
+        isParcelShopDelivery:'<?php echo $this->isParcelshopDelivery(); ?>',
+        parcelShopCombinationId:'<?php echo $this->getParcelShopCombinationId(); ?>',
+        config:'<?php echo $this->getJsonConfig(); ?>',
+        defaultCombination:'<?php echo $this->getDefaultCombination(); ?>',
+        defaultServices: '<?php echo $this->getDefaultServices(); ?>',
+        targetCountry:'<?php echo $this->getTargetCountry(); ?>',
+        weightWarning:'<?php echo $this->__('Please note the maximum weight') ?>',
+        cashWarning:'<?php echo $this->__('Please note the maximum cash amount') ?>',
+        emtyMsg:'<?php echo $this->__('Field can not be empty') ?>',
+        priceFormat:'<?php echo json_encode(Mage::app()->getLocale()->getJsPriceFormat()) ?>'
+    });
+
+//]]>
+</script>
+<?php endif;?>

@@ -1,0 +1,34 @@
+<table class="switcher" width="100%" cellpadding="5" style="border-spacing:10px">
+    <tbody>
+        <tr>
+            <td>
+                <a href="<?php echo $this->escapeHtml($this->getAgencyUrl())?>" target="_blank"><IMG border="0" src="<?php echo $this->escapeHtml($this->getAgencyLogoUrl())?>"></a>
+            </td>
+        </tr>
+        <tr><td><hr/></td></tr>
+        <tr>
+            <td>
+                <b><?php echo Mage::helper('synergeticagency_gls')->__('Support')?></b>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <?php echo Mage::helper('synergeticagency_gls')->__('If you need assistance setting up the GLS credentials and GLS services')?>,<br />
+                <a href="<?php echo $this->getSupportUrl();?>" target="_blank"><?php echo Mage::helper('synergeticagency_gls')->__('feel free to <b>contact</b> us.')?></a>
+                <br /><br />
+                <?php echo Mage::helper('synergeticagency_gls')->__('To manage your GLS assignments, your account data etc. and for informations regarding your customer account, please use')?><br />
+                <a href="<?php echo $this->getAgencyUrl();?>" target="_blank"><?php echo Mage::helper('synergeticagency_gls')->__('your <b>YourGLS</b> account.')?></a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <?php echo Mage::helper('synergeticagency_gls')->__('Version')?>: <b><?php echo Mage::helper('synergeticagency_gls')->getExtensionVersion();?></b>
+            </td>
+        </tr>
+    </tbody>
+</table>

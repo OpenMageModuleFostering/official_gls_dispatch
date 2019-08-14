@@ -1,0 +1,23 @@
+<?php
+$glsShipment = Mage::registry('gls_shipment');
+$shipment = Mage::registry('current_shipment');
+?>
+<div class="content-header">
+    <h3 class="icon-head head-adminhtml-sales-shipment">
+        <?php echo $this->getHeaderText() ?>
+    </h3>
+    <div style="float: right;"><?php echo $this->getButtonsHtml() ?></div>
+</div>
+<div class="entry-edit">
+    <form method="post" action="<?php echo $this->getUrl('*/*/save', array('id' => $glsShipment->getId()));?>" id="edit_form">
+        <input type="hidden" name="shipment_id" value="<?php echo $shipment->getId(); ?>" />
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('GLS Shipment Data');?></h4>
+        </div>
+        <?php echo $this->getChildHtml('gls_shipment_edit_form'); ?>
+    </form>
+</div>
+<script type="text/javascript">
+    editForm = new varienForm('edit_form', '');
+</script>

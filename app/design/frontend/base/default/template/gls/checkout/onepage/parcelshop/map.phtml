@@ -1,0 +1,46 @@
+<script type="text/javascript">
+    function toJson(obj) {
+        return JSON.stringify(obj, null, 2);
+    }
+
+    window.addEventListener('message', function(e) {
+        window.opener.postMessage(e.data, '*');
+        window.close(self);
+    }, false);
+
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+    var origin = location.protocol + '//' + location.host + location.pathname
+    var countryCode = '';
+    var zip = '';
+    if(getParameterByName('countryCode')){
+        countryCode = '&countryCode=' + getParameterByName('countryCode');
+    }
+    if(getParameterByName('zip')){
+        zip = '&zip=' + getParameterByName('zip');
+    }
+
+</script>
+<style type="text/css">
+    body, div {
+        height: 100%!important;
+        display: block;
+        position: absolute;
+        width: 100%;
+        margin:0;
+    }
+    .page-popup {
+        padding: 0;
+    }
+</style>
+
+<script type="text/javascript">
+    document.write('<iframe src="<?php echo Mage::getStoreConfig('gls/parcel_shop/parcel_shop_url'); ?>?origin=' + origin + countryCode + zip + '" frameborder="0" height="100%" width="100%" marginheight="0" marginwidth="0" scrolling="auto"></iframe>');
+</script>

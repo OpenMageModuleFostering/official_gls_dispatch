@@ -1,0 +1,45 @@
+<?php if($this->isActive()) { ?>
+<ul id="parcelshop_fields" class="form-list">
+    <li class="fields" style="display:none;">
+        <div class="fields">
+            <label for="shipping:parcelshop_name"><?php print $this->__('Parcelshop Name') ?></label>
+            <div class="input-box">
+                <input type="text"
+                       id="shipping:parcelshop_name"
+                       name="shipping[parcelshop_name]"
+                       value=""
+                       title="<?php print $this->__('Parcelshop Name') ?>"
+                       class="input-text required-entry">
+            </div>
+        </div>
+    </li>
+    <li class="fields" style="display:none;">
+        <label for="shipping:parcelshop_id"><?php print $this->__('Parcelshop ID') ?></label>
+        <div class="input-box">
+            <input type="text"
+                   id="shipping:parcelshop_id"
+                   name="shipping[parcelshop_id]"
+                   value=""
+                   title="<?php print $this->__('Parcelshop ID') ?>"
+                   class="input-text required-entry">
+        </div>
+    </li>
+</ul>
+<ul class="form-list">
+    <li class="control" id="parcelshopfinder_control">
+        <input type="checkbox"
+               class="checkbox packstation_checkbox"
+               title="<?php print $this->__('Ship to Parcelshop'); ?>"
+               name="shipping[parcelshop_active]"
+               value="1"
+               id="shipping:parcelshop_active">
+        <label id="package_announcement_label" for="shipping:parcelshop_active"> <?php print $this->__('Ship to Parcelshop') ?></label>
+        <button type="button" class="button" id="shipping:findGlsParcelShop" title="<?php print $this->__('Find parcel shop') ?>"><span><span><?php print $this->__('Find parcel shop') ?></span></span></button>
+    </li>
+</ul>
+<script type="text/javascript">
+    //<![CDATA[
+        var glsParcelShop = new GlsParcelShop({config: '<?php echo $this->getCountriesJson(); ?>', countryConfig: '<?php echo $this->getJsonConfig(); ?>', origin:'<?php echo Mage::helper('core/url')->getCurrentUrl(); ?>', notSelectedLabel:'<?php print $this->__('Please select a parcel shop') ?>', invalidShopLabel:'<?php print $this->__('The selected shop is not allowed for your country') ?>', billingInfoUrl:'<?php print Mage::getUrl('gls/frontend/parcelShopMapParams',array('_secure'=>true)) ?>', parcelShopFinderUrl:'<?php print Mage::getUrl('gls/frontend/parcelShopMap',array('_secure'=>true)) ?>'});
+    //]]>
+</script>
+<?php } ?>

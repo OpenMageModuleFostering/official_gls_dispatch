@@ -1,0 +1,34 @@
+<?php
+$logoJs = '';
+foreach($this->getLogos() AS $logoKey => $logoSrc){
+    $logoJs .= 'radio = $("s_method_synergeticagency_gls_'.$logoKey.'");';
+    $logoJs .= 'if(radio != undefined) { ';
+    $logoJs .= '    if(radio.up().hasClassName("no-display") && $("logo_'.$logoKey.'") == undefined){';
+    $logoJs .= '        radio.up().next("label").insert({top: new Element("img", {src: "'.$logoSrc.'", id: "logo_'.$logoKey.'"})})   ';
+    $logoJs .= '    }else if ($("logo_'.$logoKey.'") == undefined){';
+    $logoJs .= '        radio.next("label").insert({top: new Element("img", {src: "'.$logoSrc.'", id: "logo_'.$logoKey.'"})})';
+    $logoJs .= '    }';
+    $logoJs .= '}';
+}
+
+?>
+<script type="text/javascript">
+    //<![CDATA[
+    if (typeof Checkout !== 'undefined') {
+        Checkout.prototype.gotoSection = Checkout.prototype.gotoSection.wrap(
+            function (parentMethod, section, reloadProgressBlock) {
+                parentMethod(section, reloadProgressBlock);
+                var radio = '';
+                if (section == "shipping_method") {
+                    try {
+                        <?php echo $logoJs ?>
+                    } catch (err) {
+                        var e = new Error("An error occurred setting GLS logos");
+                        console.log(e.toString());
+                    }
+                }
+            }
+        );
+    }
+    //]]>
+</script>

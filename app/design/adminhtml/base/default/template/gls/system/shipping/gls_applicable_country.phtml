@@ -1,0 +1,17 @@
+<script type="text/javascript">
+    if (typeof CountryModel !== 'undefined') {
+        CountryModel.prototype.hideElement = CountryModel.prototype.hideElement.wrap(
+            function (parentMethod, elm) {
+                parentMethod(elm);
+                if (elm && elm.readAttribute('id') == 'row_carriers_synergeticagency_gls_showmethod') {
+                    if (!elm.down('.shipping-skip-show')) {
+                        elm.show();
+                    }
+                }
+            }
+        );
+        if($('row_carriers_synergeticagency_gls_showmethod') != undefined) {
+            $('row_carriers_synergeticagency_gls_showmethod').show();
+        }
+    }
+</script>

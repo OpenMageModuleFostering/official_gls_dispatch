@@ -1,0 +1,89 @@
+{
+  "DE": {
+    "domestic": {
+      "maxweight": 40,
+      "cashservice": true,
+      "cashmax": 2500,
+      "cashcurrency": "EUR",
+      "parcelshop": true,
+      "parcelshopweight": 40
+    },
+    "foreign": {
+      "countries": {
+        "AT": {
+          "maxweight": 50,
+          "parcelshop": true,
+          "parcelshopweight": 50
+        },
+        "BE": {
+          "maxweight": 50,
+          "parcelshop": true,
+          "parcelshopweight": 50
+        },
+        "PL": {
+          "maxweight": 50,
+          "parcelshop": true,
+          "parcelshopweight": 50
+        },
+        "DK": {
+          "maxweight": 50,
+          "parcelshop": true,
+          "parcelshopweight": 20
+        }
+      }
+    }
+  },
+  "DK": {
+    "domestic": {
+      "maxweight": 30,
+      "cashservice": true,
+      "cashmax": 5500,
+      "cashcurrency": "DKK",
+      "parcelshop": true,
+      "parcelshopweight": 20
+    },
+    "foreign": {
+      "countries": {
+        "AT": {
+          "maxweight": 50,
+          "parcelshop": true,
+          "parcelshopweight": 50
+        },
+        "BE": {
+          "maxweight": 50,
+          "parcelshop": false,
+          "parcelshopweight": 0
+        },
+        "PL": {
+          "maxweight": 50,
+          "parcelshop": true,
+          "parcelshopweight": 50
+        },
+        "DE": {
+          "maxweight": 50,
+          "parcelshop": true,
+          "parcelshopweight": 50
+        }
+      }
+    }
+  },
+  "FI": {
+    "domestic": {
+      "maxweight": 50,
+      "cashservice": false,
+      "cashmax": 0,
+      "cashcurrency": "",
+      "parcelshop": false,
+      "parcelshopweight": 0
+    },
+    "foreign": {
+      "countries": {
+        "DK": {
+          "maxweight": 50,
+          "parcelshop": false,
+          "parcelshopweight": 0
+        }
+      }
+    }
+  }
+}

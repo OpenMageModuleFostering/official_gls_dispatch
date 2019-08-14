@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <adminhtml_sales_order_shipment_new>
+        <reference name="head">
+            <action method="addCss"><name>gls.css</name></action>
+            <action method="addJs"><script>gls/admin.js</script></action>
+        </reference>
+    </adminhtml_sales_order_shipment_new>
+    <adminhtml_gls_shipment_edit>
+        <reference name="head">
+            <action method="addCss"><name>gls.css</name></action>
+            <action method="addJs"><script>gls/admin.js</script></action>
+        </reference>
+        <reference name="content">
+            <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_edit" name="gls_shipment_edit">
+            <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_edit_form" name="gls_shipment_edit_form">
+                <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_edit_form_packages" name="packages" />
+            </block>
+            </block>
+        </reference>
+    </adminhtml_gls_shipment_edit>
+</layout>
