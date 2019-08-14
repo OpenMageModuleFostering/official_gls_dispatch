@@ -224,7 +224,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $glsArray
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setGlsArray($glsArray) {
 		$this->glsArray = $glsArray;
@@ -234,7 +234,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 	/**
 	 * @param $key
 	 * @param $value
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function addGlsArrayValue( $key, $value ) {
 		$this->glsArray[$key] = $value;
@@ -250,7 +250,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $type
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setType($type) {
 		$this->type = $type;
@@ -267,7 +267,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
     /**
      * @param string $id
-     * @return $this
+     * @return SynergeticAgency_GlsConnector_Model_Address
      */
     public function setId($id)
     {
@@ -285,7 +285,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $name1
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setName1($name1) {
         //TODO: Implement filter in all setters (php filter)
@@ -303,7 +303,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $name2
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setName2($name2) {
 		$this->name2 = substr($name2,0,40);
@@ -320,7 +320,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $name3
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setName3($name3) {
 		$this->name3 = substr($name3,0,40);
@@ -337,7 +337,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $street1
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setStreet1($street1) {
 		$this->street1 = substr($street1,0,40);
@@ -354,7 +354,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
     /**
      * @param $street2
-     * @return $this
+     * @return SynergeticAgency_GlsConnector_Model_Address
      */
     public function setStreet2($street2) {
         $this->street2 = substr($street2,0,40);
@@ -372,7 +372,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
     /**
      * @param string $blockNo1
-     * @return $this
+     * @return SynergeticAgency_GlsConnector_Model_Address
      */
     public function setBlockNo1($blockNo1)
     {
@@ -391,7 +391,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
     /**
      * @param string $blockNo2
-     * @return $this
+     * @return SynergeticAgency_GlsConnector_Model_Address
      */
     public function setBlockNo2($blockNo2)
     {
@@ -408,7 +408,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
     /**
      * @param $country
-     * @return $this
+     * @return SynergeticAgency_GlsConnector_Model_Address
      */
 	public function setCountry( $country ) {
 
@@ -427,7 +427,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $zipCode
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setZipCode($zipCode) {
 		$this->zipCode = $zipCode;
@@ -444,7 +444,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $city
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setCity($city) {
 		$this->city = $city;
@@ -462,7 +462,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
     /**
      * @param string $province
-     * @return $this
+     * @return SynergeticAgency_GlsConnector_Model_Address
      */
     public function setProvince($province)
     {
@@ -482,7 +482,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $contact
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setContact($contact) {
 		$this->contact = $contact;
@@ -499,7 +499,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $email
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setEmail($email) {
 		$this->email = $email;
@@ -516,7 +516,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $phone
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setPhone($phone) {
 		$this->phone = $phone;
@@ -533,7 +533,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
 	/**
 	 * @param $mobile
-	 * @return $this
+	 * @return SynergeticAgency_GlsConnector_Model_Address
 	 */
 	public function setMobile($mobile) {
 		$this->mobile = $mobile;
@@ -551,7 +551,7 @@ class SynergeticAgency_GlsConnector_Model_Address {
 
     /**
      * @param string $comments
-     * @return $this
+     * @return SynergeticAgency_GlsConnector_Model_Address
      */
     public function setComments($comments)
     {

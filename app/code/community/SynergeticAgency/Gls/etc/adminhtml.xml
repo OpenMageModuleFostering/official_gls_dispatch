@@ -7,6 +7,13 @@
                     <title>GLS Shipments</title>
                     <action>adminhtml/gls_shipment/</action>
                     <sort_order>35</sort_order>
+                    <children>
+                        <gls_shipment_jobs translate="title" module="synergeticagency_gls">
+                            <title>GLS Shipment mass jobs</title>
+                            <action>adminhtml/gls_shipment_job/</action>
+                            <sort_order>10</sort_order>
+                        </gls_shipment_jobs>
+                    </children>
                 </gls_shipments>
             </children>
         </sales>

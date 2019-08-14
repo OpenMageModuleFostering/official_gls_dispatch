@@ -2,7 +2,7 @@
 <config>
     <modules>
         <SynergeticAgency_Gls>
-            <version>1.0.0</version>
+            <version>1.1.3</version>
         </SynergeticAgency_Gls>
     </modules>
     <global>
@@ -23,6 +23,9 @@
                     <shipment_address>
                         <table>synergeticagency_gls_shipment_address</table>
                     </shipment_address>
+                    <shipment_job>
+                        <table>synergeticagency_gls_shipment_job</table>
+                    </shipment_job>
                 </entities>
             </synergeticagency_gls_resource>
         </models>
@@ -113,6 +116,10 @@
 				<schedule><cron_expr>*/10 * * * *</cron_expr></schedule>
 				<run><model>synergeticagency_gls/jsonimport::run</model></run>
 			</synergeticagency_gls_jsonconfig_import>
+            <synergeticagency_gls_job_massprint>
+                <schedule><cron_expr>* * * * *</cron_expr></schedule>
+                <run><model>synergeticagency_gls/massprint::run</model></run>
+            </synergeticagency_gls_job_massprint>
 		</jobs>
 	</crontab>
     <adminhtml>
@@ -142,6 +149,14 @@
                     </save_gls_shipment_data>
                 </observers>
             </controller_action_postdispatch_adminhtml_sales_order_shipment_save>
+            <controller_action_postdispatch_adminhtml_sales_order_invoice_save>
+                <observers>
+                    <save_gls_order_status>
+                        <class>synergeticagency_gls/observer</class>
+                        <method>saveGlsOrderStatus</method>
+                    </save_gls_order_status>
+                </observers>
+            </controller_action_postdispatch_adminhtml_sales_order_invoice_save>
             <sales_order_shipment_save_before>
                 <observers>
                     <check_gls_shipment_data>
@@ -166,6 +181,14 @@
                     </synergeticagency_gls_ordergrid_adminhtml_block_html_before>
                 </observers>
             </adminhtml_block_html_before>
+            <core_block_abstract_prepare_layout_before>
+                <observers>
+                    <synergeticagency_gls_core_block_abstract_prepare_layout_before>
+                        <class>synergeticagency_gls/observer</class>
+                        <method>addMassActionToOrderGrid</method>
+                    </synergeticagency_gls_core_block_abstract_prepare_layout_before>
+                </observers>
+            </core_block_abstract_prepare_layout_before>
         </events>
         <layout>
             <updates>
@@ -240,6 +263,9 @@
                 <weight>0</weight>
                 <return_label_enabled>0</return_label_enabled>
                 <labelsize>A6</labelsize>
+                <weight_unit>kg</weight_unit>
+                <max_batch_amount>100</max_batch_amount>
+                <notify_customer_shipment>0</notify_customer_shipment>
             </shipment>
             <alternative_shipper>
                 <alternative_shipper_enabled>0</alternative_shipper_enabled>

@@ -1,0 +1,104 @@
+<script type="text/javascript">
+    var minParcels = <?php echo SynergeticAgency_Gls_Model_Shipment::GLS_SHIPMENT_MIN_PARCELS;?>;
+    var maxParcels = <?php echo SynergeticAgency_Gls_Model_Shipment::GLS_SHIPMENT_MAX_PARCELS;?>;
+    $$('.qty-parcels-change').each(function(elm){
+        elm.observe('click',function(event){
+            var dir = this.data('dir');
+            var qtyItem = this.up().select('.qty-parcels-qty').first();
+            var val = qtyItem.value;
+
+            if(!checkNumber(val)) {
+                alert('<?php echo sprintf(Mage::helper('synergeticagency_gls')->__('No valid number. Please enter numbers between %s and %s.'),SynergeticAgency_Gls_Model_Shipment::GLS_SHIPMENT_MIN_PARCELS, SynergeticAgency_Gls_Model_Shipment::GLS_SHIPMENT_MAX_PARCELS);?>');
+                return;
+            }
+            val = parseInt(val);
+
+            if((dir == '-' && val <= (minParcels+1)) || (dir == '+' && val < minParcels)) {
+                this.up().select('.qty-parcels-decrease').first().addClassName('disabled');
+            } else {
+                this.up().select('.qty-parcels-decrease').first().removeClassName('disabled');
+            }
+            if((dir == '+' && val >= (maxParcels-1)) || (dir == '-' && val > maxParcels)) {
+                this.up().select('.qty-parcels-increase').first().addClassName('disabled');
+            } else {
+                this.up().select('.qty-parcels-increase').first().removeClassName('disabled');
+            }
+            if(dir == '+') {
+                if(val < maxParcels) {
+                    qtyItem.value = val+1;
+                }
+            } else {
+                if(val > minParcels) {
+                    qtyItem.value = val-1;
+                }
+            }
+        });
+    });
+
+    $$('.qty-parcels-qty').each(function(elm){
+        elm.observe('keyup',function(event){
+            var val = this.value;
+            if(checkNumber(val)) {
+                if(val <= minParcels) {
+                    this.up().select('.qty-parcels-decrease').first().addClassName('disabled');
+                } else {
+                    this.up().select('.qty-parcels-decrease').first().removeClassName('disabled');
+                }
+                if(val >= maxParcels) {
+                    this.up().select('.qty-parcels-increase').first().addClassName('disabled');
+                } else {
+                    this.up().select('.qty-parcels-increase').first().removeClassName('disabled');
+                }
+            }
+        });
+    });
+
+    $$('.gls-print-button').each(function(elm){
+        elm.observe('click',function(event){
+            var id = this.data('id');
+            $('qty-parcels-wrap-'+id).hide();
+            $('qty-parcels-printed-'+id).show();
+        });
+    });
+
+    $$('.qty-parcels-submit').each(function(elm){
+        elm.observe('click',updateQtyRequest);
+    });
+
+    function updateQtyRequest() {
+        this.url = '<?php echo Mage::helper('adminhtml')->getUrl('*/*/updateqty') ?>';
+        this.updateQty = function () {
+            var self = this;
+            var qtyItem = self.up().select('.qty-parcels-qty').first();
+            var id = self.data('id');
+            var origQty = self.data('qty');
+            var qty = qtyItem.value;
+            if(!checkNumber(qty) || qty < minParcels || qty > maxParcels) {
+                alert('<?php echo sprintf(Mage::helper('synergeticagency_gls')->__('No valid number. Please enter numbers between %s and %s.'),SynergeticAgency_Gls_Model_Shipment::GLS_SHIPMENT_MIN_PARCELS, SynergeticAgency_Gls_Model_Shipment::GLS_SHIPMENT_MAX_PARCELS);?>');
+                return;
+            }
+            if(parseInt(qty) === parseInt(origQty)) {
+                alert('<?php echo Mage::helper('synergeticagency_gls')->__('Quantity is not changed');?>');
+                return;
+            }
+            qty = parseInt(qty);
+            new Ajax.Request(self.url, {
+                parameters: {'qty':qty,'id':id},
+                onSuccess : function(transport) {
+                    var response = transport.responseJSON || transport.responseText.evalJSON(true) || {};
+                    if(typeof(response.error) !== 'undefined') {
+                        alert(response.error);
+                        return;
+                    }
+                    $('qty-parcels-'+id).update(qty);
+                    self.data('qty',qty);
+                }
+            });
+        };
+        this.updateQty();
+    }
+
+    function checkNumber(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+</script>

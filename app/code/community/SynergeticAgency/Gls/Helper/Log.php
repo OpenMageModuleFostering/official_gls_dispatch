@@ -25,7 +25,7 @@
  */
 
 /**
- * GLS helper data
+ * GLS helper log
  *
  * @category    SynergeticAgency
  * @package     SynergeticAgency_Gls

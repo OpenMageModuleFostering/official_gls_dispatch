@@ -48,7 +48,7 @@ class SynergeticAgency_Gls_Model_Observer {
 
                 // Checking if GLS module is active at all
                 if ($config['active'] == '1') {
-
+                    $logos = array();
                     // Getting Store Country to build logo path
                     $country = Mage::getStoreConfig('general/country/default');
                     $countryCode = strtolower(Mage::getModel('directory/country')->loadByCode($country)->getIso2Code());
@@ -120,6 +120,8 @@ class SynergeticAgency_Gls_Model_Observer {
             return null;
         endif;
 
+        $helper = Mage::helper('synergeticagency_gls');
+
         $store = $shipment->getStore();
         // Return if global gls config is disabled.
         if (!Mage::getStoreConfig('gls/general/active' , $store)) {
@@ -134,13 +136,30 @@ class SynergeticAgency_Gls_Model_Observer {
         }
 
         // Return if validation fails.
-        if ( false === $this->_validateGlsShipmentData($data) ){
+        if ( false === $this->_validateGlsShipmentData($data,$shipment) ){
             return null;
         }
 
         $glsModel = Mage::getModel('synergeticagency_gls/gls');
         $glsModel->saveGlsShipment($data, $shipment);
+        // set order status
+        $helper->setOrderStatus($shipment->getOrder(),$helper->__('GLS shipment successfully saved'));
 
+    }
+
+    /**
+     * sets the gls order state on invoice save
+     * @param $observer
+     */
+    public function saveGlsOrderStatus($observer) {
+        $invoice = Mage::registry('current_invoice');
+        $order = $invoice->getOrder();
+        $glsShipments = Mage::getModel('synergeticagency_gls/shipment')->getCollection();
+        $glsShipments->addFieldToFilter('order_id',array('eq' => $order->getId()));
+        if($glsShipments->count()) {
+            $helper = Mage::helper('synergeticagency_gls');
+            $helper->setOrderStatus($order,$helper->__('Order with GLS-Shipment'));
+        }
     }
 
 
@@ -148,9 +167,10 @@ class SynergeticAgency_Gls_Model_Observer {
      * Server side validation of gls shipment data in sales_order view
      * This validation should never be triggered due to client side validation
      * @param $data
+     * @param Mage_Sales_Model_Order_Shipment $shipment
      * @return bool
      */
-    public function _validateGlsShipmentData($data) {
+    public function _validateGlsShipmentData($data,$shipment) {
 
         if (empty($data['shipment']['packages']) ) {
             return false;
@@ -160,7 +180,7 @@ class SynergeticAgency_Gls_Model_Observer {
             return false;
         }
 
-        $errorMessages = Mage::getModel('synergeticagency_gls/gls')->validateGlsShipmentData($data);
+        $errorMessages = Mage::getModel('synergeticagency_gls/gls')->validateGlsShipmentData($data,$shipment);
         if(true !== $errorMessages) {
             return false;
         }
@@ -178,10 +198,11 @@ class SynergeticAgency_Gls_Model_Observer {
     public function checkGlsShipmentData(Varien_Event_Observer $observer)
     {
         $data = Mage::app()->getRequest()->getPost();
+        $shipment = $observer->getEvent()->getShipment();
         //at the moment this method is also getting called when label is printed
         //check if post data...
         if(isset($data['shipment']['gls']) && isset($data['shipment']['gls']['ship_with_gls']) && $data['shipment']['gls']['ship_with_gls'] == '1') {
-            $check = Mage::getModel('synergeticagency_gls/gls')->validateGlsShipmentData($data);
+            $check = Mage::getModel('synergeticagency_gls/gls')->validateGlsShipmentData($data,$shipment);
             if ($check !== true) {
                 Mage::register('gls_shipment_error', true);
                 Mage::throwException($check);
@@ -201,6 +222,7 @@ class SynergeticAgency_Gls_Model_Observer {
                 ->getCollection()
                 ->addFieldToFilter('order_id',$orderId)
                 ->addFieldToFilter('printed','0')
+                ->addFieldToFilter('job_id',array('null' => true))
                 ->setOrder('gls_shipment_id');
             $hasUnprintedGlsShipments = $glsShipmentCollection->count();
             if($hasUnprintedGlsShipments) {
@@ -231,6 +253,28 @@ class SynergeticAgency_Gls_Model_Observer {
             $this->_modifyParcelShopId($block);
         }
     }
+
+    /**
+     * @param $observer
+     * @throws Exception
+     */
+    public function addMassActionToOrderGrid($observer)
+    {
+        $block = $observer->getEvent()->getBlock();
+        if($block instanceof Mage_Adminhtml_Block_Widget_Grid_Massaction && $block->getRequest()->getControllerName() == 'sales_order')
+        {
+            $block->addItem('createGlsShipment', array(
+                'label' => Mage::helper('synergeticagency_gls')->__('Create GLS shipments'),
+                'url' => Mage::app()->getStore()->getUrl('adminhtml/gls_shipment/masscreate'),
+            ));
+
+            $block->addItem('printGlsLabels', array(
+                'label' => Mage::helper('synergeticagency_gls')->__('Print GLS labels'),
+                'url' => Mage::app()->getStore()->getUrl('adminhtml/gls_shipment/massprint'),
+            ));
+        }
+    }
+
 
     /**
      * @param Mage_Adminhtml_Block_Sales_Order_Grid $grid

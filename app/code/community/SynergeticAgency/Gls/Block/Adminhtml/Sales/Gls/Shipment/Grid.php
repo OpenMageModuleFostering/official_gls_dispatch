@@ -49,8 +49,8 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Gls_Shipment_Grid extends Mage_
         ),
         'main_table.shipment_id=shipment.entity_id',
         array(
-            'shipment_increment_id' => 'increment_id',
-            'created_at'         => 'created_at'
+            'shipment_increment_id'     => 'increment_id',
+            'shipping_date'             => 'created_at'
         )
         )->joinLeft(
             array(
@@ -58,10 +58,10 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Gls_Shipment_Grid extends Mage_
             ),
             'shipment.order_id=order.entity_id',
             array(
-                'order_id'           => 'entity_id',
-                'order_increment_id' => 'increment_id',
-                'shipping_name'      => 'shipping_name',
-                'order_date'         => 'created_at'
+                'order_id'              => 'entity_id',
+                'order_increment_id'    => 'increment_id',
+                'order_shipping_name'   => 'shipping_name',
+                'order_date'            => 'created_at'
             )
         );
 
@@ -80,47 +80,101 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Gls_Shipment_Grid extends Mage_
         $helper = Mage::helper('synergeticagency_gls');
 
         $this->addColumn('gls_shipment_id', array(
-            'header' => $helper->__('GLS Shipment ID'),
-            'index'  => 'gls_shipment_id'
+            'header'        => $helper->__('GLS Shipment ID'),
+            'index'         => 'gls_shipment_id'
         ));
 
         $this->addColumn('consignment_id', array(
-            'header' => $helper->__('GLS Consignment ID'),
-            'index'  => 'consignment_id'
+            'header'        => $helper->__('GLS Consignment ID'),
+            'index'         => 'consignment_id'
         ));
 
         $this->addColumn('order', array(
-            'header'    => Mage::helper('sales')->__('Order'),
-            'align'     => 'left',
-            'index'     => 'order.increment_id',
-            'renderer'  => 'synergeticagency_gls/adminhtml_sales_gls_shipment_grid_renderer_order'
+            'header'        => Mage::helper('sales')->__('Order'),
+            'align'         => 'left',
+            'index'         => 'order_increment_id',
+            'renderer'      => 'synergeticagency_gls/adminhtml_sales_gls_shipment_grid_renderer_order'
         ));
 
         $this->addColumn('shipping_name', array(
-            'header' => Mage::helper('sales')->__('Ship to Name'),
-            'index' => 'shipping_name',
+            'header'        => Mage::helper('sales')->__('Ship to Name'),
+            'index'         => 'order_shipping_name',
+            'filter_index'  => 'order.shipping_name'
         ));
 
         $this->addColumn('shipment', array(
-            'header'    => Mage::helper('sales')->__('Shipments'),
-            'align'     => 'left',
-            'index'     => 'shipment.increment_id',
-            'renderer'  => 'synergeticagency_gls/adminhtml_sales_gls_shipment_grid_renderer_shipment',
+            'header'        => Mage::helper('sales')->__('Shipments'),
+            'align'         => 'left',
+            'index'         => 'shipment_increment_id',
+            'filter_index'  => 'shipment.increment_id',
+            'renderer'      => 'synergeticagency_gls/adminhtml_sales_gls_shipment_grid_renderer_shipment',
         ));
+
+        $this->addColumn('error', array(
+            'header'        => $helper->__('Error'),
+            'align'         => 'left',
+            'index'         => 'error_message',
+            'filter'        => false,
+            'renderer'      => 'synergeticagency_gls/adminhtml_sales_gls_shipment_grid_renderer_error',
+        ));
+
         $this->addColumn('created_at', array(
-            'header'    => Mage::helper('sales')->__('Date Shipped'),
-            'index'     => 'created_at',
-            'type'      => 'datetime',
+            'header'        => Mage::helper('sales')->__('Date Shipped'),
+            'index'         => 'shipping_date',
+            'filter_index'  => 'shipment.created_at',
+            'type'          => 'datetime',
         ));
 
         $this->addColumn('pdf', array(
-            'header'    => Mage::helper('sales')->__('Action'),
-            'align'     => 'left',
-            'renderer'  => 'synergeticagency_gls/adminhtml_sales_gls_shipment_grid_renderer_pdf',
-            'filter'    => false,
-            'sortable'  => false,
+            'header'        => Mage::helper('sales')->__('Action'),
+            'align'         => 'left',
+            'renderer'      => 'synergeticagency_gls/adminhtml_sales_gls_shipment_grid_renderer_pdf',
+            'filter'        => false,
+            'sortable'      => false,
+        ));
+
+        $this->addColumn('qty_parcels', array(
+            'header'        => $helper->__('Quantity parcels'),
+            'align'         => 'left',
+            'renderer'      => 'synergeticagency_gls/adminhtml_sales_gls_shipment_grid_renderer_qtyparcels',
+            'filter'        => false,
+            'sortable'      => false,
+        ));
+
+        $this->addColumn('qty_update', array(
+            'header'        => $helper->__('Quantity update'),
+            'align'         => 'left',
+            'renderer'      => 'synergeticagency_gls/adminhtml_sales_gls_shipment_grid_renderer_qtyupdate',
+            'filter'        => false,
+            'sortable'      => false,
+            'width'         => '220px',
         ));
 
         return parent::_prepareColumns();
+    }
+
+    /**
+     * prepares mass action
+     * @return $this
+     */
+    protected function _prepareMassaction()
+    {
+        $this->setMassactionIdField('gls_shipment_id');
+        $this->getMassactionBlock()->setFormFieldName('gls_shipment_id');
+
+        $this->getMassactionBlock()->addItem('print', array(
+            'label'=> Mage::helper('synergeticagency_gls')->__('Print GLS labels'),
+            'url'  => $this->getUrl('*/*/massprintshipment', array('' => '')),
+        ));
+
+        return $this;
+    }
+
+    /**
+     * @param $row Varien_Object
+     * @return string
+     */
+    public function getRowUrl($row) {
+        return '';
     }
 }

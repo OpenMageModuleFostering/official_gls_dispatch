@@ -13,6 +13,11 @@ class SynergeticAgency_GlsConnector_Connector
 	const GLS_API_CONNECTOR_FUNC_SHIPPING = "shipments";
 	const GLS_API_CONNECTOR_FUNC_JSON = "shipments/configuration";
 
+    /** Curl request timed out or was not reachable */
+    const GLS_API_CONNECTOR_ERROR_CODE_CURL_EXEC_FAILED = 30;
+    /** Curl request returned an error */
+    const GLS_API_CONNECTOR_ERROR_CODE_CURL_ERROR = 31;
+
 	private $host;
 	private $schema;
 	private $port;
@@ -176,9 +181,10 @@ class SynergeticAgency_GlsConnector_Connector
             $this->curlExec();
 		} else {
 			if($this->getCurlErrorRetryCount() === $this->getCurlErrorRetry()) {
+                $errorCode = self::GLS_API_CONNECTOR_ERROR_CODE_CURL_EXEC_FAILED;
 				$logMessage = 'retry curlExec failed for ' . $this->getCurlErrorRetryCount() . ' times';
 				$this->getLog()->write( __METHOD__, __LINE__, $logMessage, SynergeticAgency_GlsConnector_Log::EMERG );
-				throw new Exception( $logMessage );
+				throw new Exception( get_class($this).': '.$logMessage,$errorCode );
 			}
 			$this->setCurlErrorRetryCount( 0 );
 		}
@@ -241,6 +247,8 @@ class SynergeticAgency_GlsConnector_Connector
 
 			$logMessage = '\$this->getCurlResponse(): ' . var_export( $this->getCurlResponse(), 1);
 			$this->getLog()->write( __METHOD__, __LINE__, $logMessage, SynergeticAgency_GlsConnector_Log::INFO );
+            $errorCode = self::GLS_API_CONNECTOR_ERROR_CODE_CURL_ERROR;
+            throw new Exception( get_class($this).': '.$logMessage,$errorCode );
 
 		} else {
 			$responseArray = json_decode($this->getCurlResponseBody());
@@ -1023,18 +1031,18 @@ class SynergeticAgency_GlsConnector_Connector
      * @param   array       $labels     Array that contains serveral labels saved on the filesystem
      *                                  Note, that these files must be base64 decoded,
      *                                  because the used ZEND PDF can only handle base64_decoded files
-     * @param   bool        $target
      * @return  bool|string $returnValue    returns false, if something went wrong
      *                                      returns full path of combined file
      * @throws  Zend_Pdf_Exception
      */
-    public function combineLabels( $labels, $target = false )
+    public function combineLabels( $labels )
     {
+        if( count($labels) === 1 ){
+            return array_shift( $labels );
+        }
 
-        $returnValue = false;
         $labelCount = 0;
         $labelPagesCount = 0;
-        $maxLabelCount = 100;
 
         // just to simulate more files than given in array $labels
         #$labels500 = array();
@@ -1047,57 +1055,33 @@ class SynergeticAgency_GlsConnector_Connector
         #$labels = $labels500;
 
         // init Zend PDF
-        // Note, that ZEND PDF can only handle base64_decoded files!
         $zendPDF = new Zend_Pdf();
         $zendPDF->properties['encoding'] = "utf-8";
 
         $labelMerged = new Zend_Pdf();
         $labelMerged->properties['encoding'] = "utf-8";
 
-        $zendPDF = new Zend_Pdf();
-        $loadedLabelFiles = array();
-        $firstFile = false;
         foreach ($labels AS $key => $label) {
-            if($firstFile === false ){
-                $firstFile = $label;
-            }
-
             $logMessage = "clone Label No " . ++$labelCount;
             $this->getLog()->write( __METHOD__, __LINE__, $logMessage, SynergeticAgency_GlsConnector_Log::INFO );
             try {
-                $loadedLabelFiles[$key] = $zendPDF::load($label);
-
-                // add all pages from the first PDF to our new document
-                foreach ($loadedLabelFiles[$key]->pages as $page) {
+                $loadedLabelFiles = $zendPDF::parse($label);
+                // add all pages from the loaded PDF to our new document
+                foreach ($loadedLabelFiles->pages as $page) {
                     $clonedPage = clone $page;
                     $labelMerged->pages[] = $clonedPage;
                     $logMessage = "clone Page No " . ++$labelPagesCount . " for Label No " . $labelCount;
                     $this->getLog()->write( __METHOD__, __LINE__, $logMessage, SynergeticAgency_GlsConnector_Log::INFO );
                 }
+                $loadedLabelFiles = null; // freeup ram
             } catch (Exception $e) {
                 $logMessage = $e->getMessage() . " => " . $label;
                 $this->getLog()->write( __METHOD__, __LINE__, $logMessage, SynergeticAgency_GlsConnector_Log::ERR );
             }
-
-            if ($labelCount >= $maxLabelCount) {
-                break;
-            }
         }
-
-        // send the merged PDF document to browser
-        #header('Content-type: application/pdf');
-        #echo $labelMerged->render();
-
-        // or save it into filesystem
-        if( $target !== false && file_exists(dirname($target)) ){
-            $returnValue = $target;
-
-        } else {
-            $returnValue = $firstFile . ".combined.pdf";
+        if(count($labelMerged->pages)) {
+            return $labelMerged->render();
         }
-        $labelMerged->save( $returnValue );
-
-        return $returnValue;
+        return false;
     }
-
 }

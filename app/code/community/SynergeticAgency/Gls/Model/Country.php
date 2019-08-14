@@ -58,4 +58,19 @@ class SynergeticAgency_Gls_Model_Country extends Mage_Core_Model_Abstract {
         }
         return $this->_options;
     }
+
+    /**
+     * @param int $combinationId
+     * @return null|SynergeticAgency_Gls_Model_Resource_Service_Collection
+     */
+    public function getAddonServicesByCombination($combinationId) {
+        $options = $this->getOptions();
+        if(empty($options)) return null;
+        foreach($options as $option) {
+            if($option->getCombination()->getId() == $combinationId) {
+                return $option->getAddonServices();
+            }
+        }
+        return null;
+    }
 }

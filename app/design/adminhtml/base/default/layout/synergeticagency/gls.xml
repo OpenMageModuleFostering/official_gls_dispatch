@@ -13,10 +13,23 @@
         </reference>
         <reference name="content">
             <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_edit" name="gls_shipment_edit">
-            <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_edit_form" name="gls_shipment_edit_form">
-                <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_edit_form_packages" name="packages" />
-            </block>
+                <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_edit_form" name="gls_shipment_edit_form">
+                    <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_edit_form_packages" name="packages" />
+                </block>
             </block>
         </reference>
     </adminhtml_gls_shipment_edit>
+    <adminhtml_gls_shipment_job_index>
+        <reference name="js">
+            <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_job_grid_js" name="gls_job_grid_js" />
+        </reference>
+    </adminhtml_gls_shipment_job_index>
+    <adminhtml_gls_shipment_index>
+        <reference name="head">
+            <action method="addJs"><script>gls/admin.js</script></action>
+        </reference>
+        <reference name="js">
+            <block type="synergeticagency_gls/adminhtml_sales_gls_shipment_grid_js" name="gls_shipment_grid_js" />
+        </reference>
+    </adminhtml_gls_shipment_index>
 </layout>

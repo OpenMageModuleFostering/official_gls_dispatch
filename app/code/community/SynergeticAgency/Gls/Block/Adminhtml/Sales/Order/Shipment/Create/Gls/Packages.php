@@ -82,12 +82,7 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls_Packa
      */
     public function isCashService() {
         $shipment = $this->_getCurrentShipment();
-        if($shipment) {
-            if($shipment->getOrder()->getPayment()->getMethodInstance() instanceof SynergeticAgency_Gls_Model_Glscashondelivery) {
-                return true;
-            }
-        }
-        return false;
+        return Mage::helper('synergeticagency_gls/validate')->isCashService($shipment);
     }
 
     /**

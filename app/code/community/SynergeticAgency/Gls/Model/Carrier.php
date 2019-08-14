@@ -136,7 +136,6 @@ class SynergeticAgency_Gls_Model_Carrier
         foreach ($this->_shippingConfigKeys AS $deliveryConfigKey) {
             //@todo check price and name here as well and if empty disable
             if($this->_glsConfig['active_'.$deliveryConfigKey] == '1'){
-                /** @var _Shipping_Helper_Data $expressMaxProducts */
                 $methodName = '_get'.Mage::helper('synergeticagency_gls')->underlineToCamelCase($deliveryConfigKey, TRUE).'Rate';
                 if(method_exists($this, $methodName)) {
                     $methodResult = $this->{$methodName}();

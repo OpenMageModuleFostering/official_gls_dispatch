@@ -28,7 +28,7 @@ if ($_glsShipment && $_glsShipment->getId()):
                 </td>
             </tr>
             <tr class="even">
-                <td><?php print $this->__('Shipping Date') ?></td>
+                <td><?php print $this->__('Shipping date') ?></td>
                 <td>
                     <?php $format = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM);
                     echo Mage::app()->getLocale()->date(strtotime($_glsShipment->getShippingDate()))->toString($format); ?>
@@ -50,6 +50,17 @@ if ($_glsShipment && $_glsShipment->getId()):
                 <td><strong><?php echo $this->__('Status')?></strong></td>
                 <td><strong><?php echo $_glsShipment->getPrinted() == '1' ? $this->__('Printed') : $this->__('Not printed') ?></strong></td>
             </tr>
+            <?php $errorMessage = trim($_glsShipment->getErrorMessage()); ?>
+            <?php if(!empty($errorMessage)) : ?>
+                <tr class="odd">
+                    <td id="gls-error">&nbsp;<br />&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr class="even">
+                    <td><strong style="color: red;"><?php echo $this->__('Error')?></strong></td>
+                    <td><strong style="color: red;"><?php echo $this->__('Error-Code')?>:</strong> <?php echo $_glsShipment->getErrorCode();?><br /><strong style="color: red;"><?php echo $this->__('Error-Message')?>:</strong> <?php echo $_glsShipment->getErrorMessage();?></td>
+                </tr>
+            <?php endif;?>
             <tr class="odd">
                 <td colspan="2">
                     <?php echo $this->__('Packages') ?>
@@ -58,8 +69,8 @@ if ($_glsShipment && $_glsShipment->getId()):
                         <tr>
                             <th><?php echo $this->__('Parcel #');?></th>
                             <th><?php echo $this->__('Weight (in kg)');?></th>
-                            <th><?php echo sprintf($this->__('Cash Amount (in %s)'),$this->getCurrency()) ?></th>
-                            <th><?php echo $this->__('Parcel Number');?></th>
+                            <th><?php echo sprintf($this->__('Cash amount (in %s)'),$this->getCurrency()) ?></th>
+                            <th><?php echo $this->__('Parcel number');?></th>
                         </tr>
                         <?php foreach ($_glsShipment->getShipmentParcels() as $parcel) : ?>
                         <tr>
@@ -77,12 +88,17 @@ if ($_glsShipment && $_glsShipment->getId()):
     </table>
 </div>
 <p class="form-buttons">
-    <?php if($_glsShipment->getPrinted() != '1') : ?>
+    <?php if($_glsShipment->getPrinted() != '1' && !$_glsShipment->getJobId()) : ?>
         <button id="pdf" type="button" class="scalable save" onclick="setLocation('<?php echo $this->getUrl('adminhtml/gls_shipment/print', array('id' => $_glsShipment->getId())); ?>');this.disabled=true;this.className += ' disabled';document.getElementById('edit_gls_shipment').disabled=true;document.getElementById('edit_gls_shipment').className += ' disabled';" style="">
             <span><?php echo $this->__("PDF") ?></span>
         </button>
         <button id="edit_gls_shipment" type="button" class="scalable save" onclick="setLocation('<?php echo $this->getUrl('adminhtml/gls_shipment/edit', array('id' => $_glsShipment->getId())); ?>')" style="">
             <span><?php echo $this->helper('sales')->__('Edit') ?></span>
+        </button>
+    <?php endif; ?>
+    <?php if($_glsShipment->getJobId()) : ?>
+        <button id="pdf" type="button" class="scalable save disabled" disabled>
+            <span><?php echo $this->__("In mass action") ?></span>
         </button>
     <?php endif; ?>
 </p>

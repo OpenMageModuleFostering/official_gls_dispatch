@@ -19,33 +19,29 @@
  * needs please refer to http://www.magento.com for more information.
  *
  * @category   SynergetigAgency
- * @package    SynergeticAgency\Gls\Helper
+ * @package    SynergeticAgency\Gls\Model\System\Config\Source
  * @copyright  Copyright (c) 2016 synergetic agency AG (http://agency.synergetic.ag)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
- * Class SynergeticAgency_Gls_Block_Adminhtml_System_Config_Note
+ * Used in creating options for GLS weight configuration
+ *
  */
-class SynergeticAgency_Gls_Block_Adminhtml_System_Config_Note extends Mage_Adminhtml_Block_Abstract
-    implements Varien_Data_Form_Element_Renderer_Interface
+class SynergeticAgency_Gls_Model_System_Config_Source_Weightunit
 {
-    /**
-     * Template
-     * @var string
-     */
-    protected $_template = 'gls/system/config/note.phtml';
 
-    /**
-     * Render html
-     *
-     * @param Varien_Data_Form_Element_Abstract $fieldset
-     * @return string
-     */
-    public function render(Varien_Data_Form_Element_Abstract $fieldset)
+    public function toOptionArray()
     {
-        $this->addData($fieldset->getOriginalData());
-        $this->setData('agency_logo_url',Mage::getDesign()->getSkinUrl('images/gls/gls-logo.png'));
-        return $this->toHtml();
+        return [
+            [
+                'value' => SynergeticAgency_Gls_Model_Gls::GLS_WEIGHT_UNIT_G,
+                'label' => Mage::helper('synergeticagency_gls')->__(SynergeticAgency_Gls_Model_Gls::GLS_WEIGHT_UNIT_G)
+            ],
+            [
+                'value' => SynergeticAgency_Gls_Model_Gls::GLS_WEIGHT_UNIT_KG,
+                'label' => Mage::helper('synergeticagency_gls')->__(SynergeticAgency_Gls_Model_Gls::GLS_WEIGHT_UNIT_KG)
+            ]
+        ];
     }
 }

@@ -72,15 +72,6 @@ Mage::getSingleton('eav/config')
     ->setData('used_in_forms', array('customer_address_edit','adminhtml_customer_address','customer_register_address'))
     ->save();
 
-// todo remove later just for fixing
-$installer->getConnection()->dropColumn($installer->getTable('sales/quote_address'), 'parcelshop_id');
-$installer->getConnection()->dropColumn($installer->getTable('sales/order_address'), 'parcelshop_id');
-$installer->getConnection()->dropColumn($installer->getTable('sales/quote_address'), 'parcelshop_name');
-$installer->getConnection()->dropColumn($installer->getTable('sales/order_address'), 'parcelshop_name');
-$installer->getConnection()->dropColumn($installer->getTable('sales/quote_address'), 'to_parcelshop');
-$installer->getConnection()->dropColumn($installer->getTable('sales/order_address'), 'to_parcelshop');
-
-
 /**
  * add attribute parcelshop_id to quote_address table
  */

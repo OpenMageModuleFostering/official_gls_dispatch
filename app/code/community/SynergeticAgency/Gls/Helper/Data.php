@@ -300,4 +300,68 @@ class SynergeticAgency_Gls_Helper_Data extends Mage_Core_Helper_Abstract {
     {
         return (string) Mage::getConfig()->getNode()->modules->SynergeticAgency_Gls->version;
     }
+
+    /**
+     * @param Mage_Sales_Model_Order $order
+     * @param string $comment
+     * @param bool|int $isError
+     * @param bool|int $save
+     * @throws Exception
+     */
+    public function setOrderStatus($order,$comment,$isError=false,$save=true) {
+        $state = $order->getState();
+        $originalStatus = $order->getStatus();
+        $status = '';
+        switch($state) {
+            case Mage_Sales_Model_Order::STATE_NEW:
+                if($isError) {
+                    $status = SynergeticAgency_Gls_Model_Gls::GLS_STATUS_PENDING_ERROR;
+                } else {
+                    $status = SynergeticAgency_Gls_Model_Gls::GLS_STATUS_PENDING;
+                }
+                break;
+            case Mage_Sales_Model_Order::STATE_PROCESSING:
+                if($isError) {
+                    $status = SynergeticAgency_Gls_Model_Gls::GLS_STATUS_PROCESSING_ERROR;
+                } else {
+                    $status = SynergeticAgency_Gls_Model_Gls::GLS_STATUS_PROCESSING;
+                }
+                break;
+            case Mage_Sales_Model_Order::STATE_COMPLETE:
+                if(!$isError) {
+                    $status = SynergeticAgency_Gls_Model_Gls::GLS_STATUS_COMPLETE;
+                }
+                break;
+        }
+        if(!empty($status) && $originalStatus != $status) {
+            $order->addStatusHistoryComment($comment, $status);
+            if($save) {
+                $order->save();
+            }
+        }
+    }
+
+    /**
+     * @param Mage_Core_Model_Store $store
+     * @return SynergeticAgency_GlsConnector_Connector
+     */
+    public function getConnector($store) {
+        $connector = new SynergeticAgency_GlsConnector_Connector();
+
+        // in default sandbox is enabled
+        if( Mage::getStoreConfig('gls/general/sandbox',$store) !== '1' ){
+            Mage::helper("synergeticagency_gls/log")->log( __METHOD__, __LINE__, "gls/general/sandbox is set to '0'", Zend_Log::INFO );
+            $connector->setGlsApiSandbox( false );
+        }
+
+        $connector->setGlsApiUrl(Mage::getStoreConfig('gls/general/api_url',$store));
+        $connector->setGlsApiAuthUsername( Mage::getStoreConfig('gls/general/apiAuthUsername',$store) );
+        $connector->setGlsApiAuthPassword( Mage::helper('core')->decrypt(Mage::getStoreConfig('gls/general/apiAuthPassword', $store)) );
+
+        // disabled by default
+        if(Mage::getStoreConfig('gls/general/connector_log_enabled',$store) === '1') {
+            $connector->getLog()->activate()->setLogFile(Mage::getBaseDir('log').DS.'SynergeticAgency_GlsConnector.log');
+        }
+        return $connector;
+    }
 }

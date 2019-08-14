@@ -33,14 +33,14 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Gls_Shipment_Grid_Renderer_Pdf 
     public function render(Varien_Object $row)
     {
         if($row->getPrinted()) {
-            $html = '<span>'.$this->__('Printed').'</span>';
-
             $html = sprintf('<button onclick="setLocation(\'%s\');this.disabled=true;this.className += \' disabled\'" disabled="" class=" disabled">%s</button>', $this->getUrl('*/gls_shipment/print', array('id' => $row->getId())), $this->__('Printed'));
 
-
+        } elseif($row->getJobId()) {
+            $html = sprintf('<button onclick="setLocation(\'%s\');this.disabled=true;this.className += \' disabled\'" disabled="" class=" disabled">%s</button>', $this->getUrl('*/gls_shipment/print', array('id' => $row->getId())), $this->__('In mass action'));
         } else {
-            $html = sprintf('<button onclick="setLocation(\'%s\');this.disabled=true;this.className += \' disabled\'">%s</button>', $this->getUrl('*/gls_shipment/print', array('id' => $row->getId())), $this->__('Download PDF'));
+            $html = sprintf('<button class="gls-print-button" data-id="%s" onclick="setLocation(\'%s\');this.disabled=true;this.className += \' disabled\'">%s</button>',$row->getId(), $this->getUrl('*/gls_shipment/print', array('id' => $row->getId())), $this->__('Download PDF'));
         }
-        return $html;
+        // the anchor is added to disable the click action for the checkbox
+        return '<a style="display: none" href=""></a>'.$html;
     }
 }

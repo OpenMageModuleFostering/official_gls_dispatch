@@ -212,6 +212,36 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </labelsize>
+                        <weight_unit translate="label comment">
+                            <label>Weight unit</label>
+                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[Set the weight unit according to the unit chosen in your products]]></comment>
+                            <source_model>synergeticagency_gls/system_config_source_weightunit</source_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </weight_unit>
+                        <max_batch_amount translate="label comment">
+                            <label>Maximum batch processing amount</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number</validate>
+                            <sort_order>160</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Per 100 labels the memory consumption is ca. 500MB (PHP memory_limit). Please select a value that fits your environment.</comment>
+                        </max_batch_amount>
+                        <notify_customer_shipment>
+                            <label>Notify customer on shipment creation</label>
+                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[Select if customer should be notified by mail, if shipment is created through batch processing.]]></comment>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>170</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </notify_customer_shipment>
                     </fields>
                 </shipment>
                 <alternative_shipper translate="label comment" module="synergeticagency_gls">

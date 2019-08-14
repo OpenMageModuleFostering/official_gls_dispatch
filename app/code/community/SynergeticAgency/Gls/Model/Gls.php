@@ -42,6 +42,15 @@ class SynergeticAgency_Gls_Model_Gls extends Mage_Core_Model_Abstract {
     const SERVICE_GUARANTEED                    = 6;
     const SERVICE_SHOPDELIVERY                  = 7;
 
+    const GLS_WEIGHT_UNIT_KG = 'kg';
+    const GLS_WEIGHT_UNIT_G  = 'g';
+
+    const GLS_STATUS_PENDING                    = 'pending_gls';
+    const GLS_STATUS_PENDING_ERROR              = 'pending_gls_error';
+    const GLS_STATUS_PROCESSING                 = 'processing_gls';
+    const GLS_STATUS_PROCESSING_ERROR           = 'processing_gls_error';
+    const GLS_STATUS_COMPLETE                   = 'complete_gls';
+
     /**
      * Returns an array with available gls products available for inland shipping.
      * A gls product in this module is a combination of gls services wrapped up to a product for better usability.
@@ -209,6 +218,140 @@ class SynergeticAgency_Gls_Model_Gls extends Mage_Core_Model_Abstract {
     }
 
     /**
+     * @param Mage_Sales_Model_Order_Shipment $shipment
+     * @return array
+     */
+    public function prepareGlsShipmentData($shipment) {
+        $glsData = array();
+        $combination = $this->getCombinationByShipment($shipment);
+        if(!$combination) {
+            return false;
+        }
+        $service = $this->getServicesByCombinationAndShipment($combination,$shipment);
+        $glsData['combination'] = $combination;
+        $glsData['service'] = $service;
+        $glsData['shipping_date'] = date('Y-m-d'); // today
+        $glsData['return_label'] = Mage::getStoreConfig('gls/shipment/return_label_enabled',$shipment->getStore());
+        $weight = 0;
+        $items = $shipment->getOrder()->getAllItems();
+        if(count($items)) {
+            foreach($items as $item) {
+                $weight += (float)$item->getWeight() * (int)$item->getQtyOrdered();
+            }
+        }
+        if(empty($weight)) {
+            $weight = Mage::getStoreConfig('gls/shipment/weight', $shipment->getStore());
+        }
+        if(empty($weight)) {
+            return false;
+        }
+        // get unit
+        $weightUnit = Mage::getStoreConfig('gls/shipment/weight_unit', $shipment->getStore());
+        if($weightUnit == self::GLS_WEIGHT_UNIT_G) {
+            $weight = round($weight/1000,3);
+        }
+        // value should be greater than 0.1
+        if($weight <= 0.1 ) {
+            return false;
+        }
+
+        if(Mage::helper('synergeticagency_gls/validate')->isCashService($shipment)) {
+            $cashService = $shipment->getStore()->roundPrice($shipment->getOrder()->getGrandTotal());
+            $packages = array(
+                'weight' => $weight,
+                'cashservice' => $cashService
+            );
+        } else {
+            $packages = array(
+                'weight' => $weight
+            );
+        }
+        $data['shipment']['gls'] = $glsData;
+        $data['shipment']['packages'][] = $packages;
+
+        return $data;
+    }
+
+    /**
+     * @param int $combinationId
+     * @param Mage_Sales_Model_Order_Shipment $shipment
+     * @param bool $withDefault
+     * @return array
+     */
+    public function getServicesByCombinationAndShipment($combinationId,$shipment,$withDefault=true) {
+        // for the moment there is no condition in the order that can trigger a service
+        // because think green is not available in the frontend anymore
+        // but we have to check the default services
+        if(!$withDefault) {
+            return array();
+        }
+
+        $defaultServices = Mage::getStoreConfig('gls/shipment/default_services', $shipment->getStore());
+        if(empty($defaultServices)) {
+            return array();
+        }
+
+        $defaultServices = explode(',',$defaultServices);
+        foreach ($defaultServices as &$defaultService) {
+            $defaultService = intval($defaultService);
+        }
+
+        $storeCountry = Mage::getStoreConfig(Mage_Shipping_Model_Shipping::XML_PATH_STORE_COUNTRY_ID, $shipment->getStore());
+        $glsCountry = Mage::getModel('synergeticagency_gls/country')->load($storeCountry);
+        if(empty($glsCountry)) return array();
+        $services = $glsCountry->getAddonServicesByCombination($combinationId);
+        $serviceReturn = array();
+        /** @var SynergeticAgency_Gls_Model_Service $service */
+        if($services && count($services)) {
+            foreach ($services as $service) {
+                if (in_array($service->getId(), $defaultServices)) {
+                    $serviceReturn[$service->getId()] = $service->getId(); // important to have the id as key because that is the value used later on
+                }
+            }
+        }
+        return $serviceReturn;
+    }
+
+    /**
+     * @param Mage_Sales_Model_Order_Shipment $shipment
+     * @param bool $withDefault
+     * @return bool|int
+     */
+    public function getCombinationByShipment($shipment,$withDefault=true) {
+        $helper = Mage::helper('synergeticagency_gls/validate');
+        if($helper->isDomestic($shipment) && ($helper->isStandardShipping($shipment)) && !$helper->isParcelshopDelivery($shipment) && !$helper->isCashService($shipment)) {
+            return SynergeticAgency_Gls_Model_Gls::COMB_BUSINESS_PARCEL;
+        }
+        if($helper->isDomestic($shipment) && $helper->isExpressShipping($shipment)) {
+            return SynergeticAgency_Gls_Model_Gls::COMB_BUSINESS_PARCEL_GUARANTEED;
+        }
+        if($helper->isDomestic($shipment) && $helper->isParcelshopDelivery($shipment)) {
+            return SynergeticAgency_Gls_Model_Gls::COMB_BUSINESS_PARCEL_SHOPDELIVERY;
+        }
+        if($helper->isDomestic($shipment) && $helper->isCashService($shipment)) {
+            return SynergeticAgency_Gls_Model_Gls::COMB_BUSINESS_PARCEL_CASHSERVICE;
+        }
+        if((!$helper->isDomestic($shipment) || $helper->matchCountry('FI',$shipment)) && !$helper->isParcelshopDelivery($shipment) && $helper->isForeignShipping($shipment)) {
+            return SynergeticAgency_Gls_Model_Gls::COMB_EUROBUSINESS_PARCEL;
+        }
+        if(!$helper->isDomestic($shipment) && $helper->isParcelshopDelivery($shipment)) {
+            return SynergeticAgency_Gls_Model_Gls::COMB_EUROBUSINESS_PARCEL_SHOPDELIVERY;
+        }
+        if($withDefault) {
+            // none matched get the default
+            $defaultCombination = Mage::getStoreConfig('gls/shipment/default_combination', $shipment->getStore());
+            if (empty($defaultCombination)) {
+                return false;
+            }
+            // check if default combination is valid
+            if ($helper->isCombinationValid($defaultCombination, $shipment)) {
+                return $defaultCombination;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Saves a GLS shipment. Shipments are saved in modules DB Tables additionally to the Magento Tables
      * @param array $data
      * @param Mage_Sales_Model_Order_Shipment $shipment
@@ -338,19 +481,19 @@ class SynergeticAgency_Gls_Model_Gls extends Mage_Core_Model_Abstract {
      * Returns true if $data is valid
      * Returns HTML formatted error string containing information of invalid data
      * @param array $data
+     * @param Mage_Sales_Model_Order_Shipment $shipment
      * @return bool|string
-     *
      */
-    public function validateGlsShipmentData($data) {
+    public function validateGlsShipmentData($data,$shipment) {
 
         $validationResult = array();
 
-        $validationResult[] = $this->isValidWeight($data);
-        $validationResult[] = $this->isValidCashAmount($data);
+        $validationResult[] = $this->isValidWeight($data,$shipment);
+        $validationResult[] = $this->isValidCashAmount($data,$shipment);
         $validationResult[] = $this->isValidShippingDate($data);
-        $validationResult[] = $this->isValidCashService($data);
-        $validationResult[] = $this->hasValidServices($data);
-        $validationResult[] = $this->isValidDestinationCountry($data);
+        $validationResult[] = $this->isValidCashService($data,$shipment);
+        $validationResult[] = $this->hasValidServices($data,$shipment);
+        $validationResult[] = $this->isValidDestinationCountry($data,$shipment);
         $errorString = '';
         foreach($validationResult AS $messages){
             foreach($messages AS $message){
@@ -370,30 +513,31 @@ class SynergeticAgency_Gls_Model_Gls extends Mage_Core_Model_Abstract {
      * Check if parcels weight(s) is(are)within allowed maximum weight in respect of given parcel data and the corresponding configuration
      * In case the check is negative an appropriate error message(s) is getting returned (Zend validation)
      * @param $data
+     * @param Mage_Sales_Model_Order_Shipment $shipment
      * @return array
      * @throws Zend_Locale_Exception
      * @throws Zend_Validate_Exception
      */
-    public function isValidWeight($data){
+    public function isValidWeight($data,$shipment){
 
         $minWeight = 0.01;
 
         $helper = Mage::helper('synergeticagency_gls/validate');
-        $config = $helper->getConfig();
-        $symbols = Zend_Locale_Data::getList(Mage::getStoreConfig('general/locale/code', $helper->getStore()) , 'symbols');
+        $config = $helper->getConfig($shipment);
+        $symbols = Zend_Locale_Data::getList(Mage::getStoreConfig('general/locale/code', $shipment->getStore()) , 'symbols');
 
-        switch($helper->isDomestic()){
+        switch($helper->isDomestic($shipment)){
             case false:
-                switch($helper->isParcelshopDelivery()) {
+                switch($helper->isParcelshopDelivery($shipment)) {
                     case true:
-                        $maxWeight = $config->foreign->countries->{$helper->getTargetCountry()}->parcelshopweight;
+                        $maxWeight = $config->foreign->countries->{$helper->getTargetCountry($shipment)}->parcelshopweight;
                         break;
                     default:
-                        $maxWeight = $config->foreign->countries->{$helper->getTargetCountry()}->maxweight;
+                        $maxWeight = $config->foreign->countries->{$helper->getTargetCountry($shipment)}->maxweight;
                 }
                 break;
             default:
-                switch($helper->isParcelshopDelivery()) {
+                switch($helper->isParcelshopDelivery($shipment)) {
                     case true:
                         $maxWeight = $config->domestic->parcelshopweight;
                         break;
@@ -418,21 +562,22 @@ class SynergeticAgency_Gls_Model_Gls extends Mage_Core_Model_Abstract {
      * Check if parcels cash on delivery amount(s) is(are)within allowed amount in respect of given parcel data and the corresponding configuration.
      * In case the check is negative an appropriate error message(s) is getting returned (Zend validation)
      * @param $data
+     * @param Mage_Sales_Model_Order_Shipment $shipment
      * @return array
      * @throws Zend_Locale_Exception
      * @throws Zend_Validate_Exception
      */
-    public function isValidCashAmount($data){
+    public function isValidCashAmount($data,$shipment){
 
         $minAmount = 0.00;
 
         $helper = Mage::helper('synergeticagency_gls/validate');
-        $config = $helper->getConfig();
-        $symbols = Zend_Locale_Data::getList(Mage::getStoreConfig('general/locale/code', $helper->getStore()) , 'symbols');
+        $config = $helper->getConfig($shipment);
+        $symbols = Zend_Locale_Data::getList(Mage::getStoreConfig('general/locale/code', $shipment->getStore()) , 'symbols');
 
-        switch($helper->isDomestic()){
+        switch($helper->isDomestic($shipment)){
             case false:
-                $maxAmount = $config->foreign->countries->{$helper->getTargetCountry()}->cashmax;
+                $maxAmount = $config->foreign->countries->{$helper->getTargetCountry($shipment)}->cashmax;
                 break;
             default:
                 $maxAmount = $config->domestic->cashmax;
@@ -476,13 +621,14 @@ class SynergeticAgency_Gls_Model_Gls extends Mage_Core_Model_Abstract {
      * Check if submitted service combination is allowed
      * In case the check is negative an appropriate error message(s) is getting returned (Zend validation)
      * @param $data
+     * @param Mage_Sales_Model_Order_Shipment $shipment
      * @return array
      * @throws Zend_Validate_Exception
      */
-    public function hasValidServices($data){
+    public function hasValidServices($data,$shipment){
 
         $helper = Mage::helper('synergeticagency_gls/validate');
-        $countryConfig = $helper->getCountriesConfig();
+        $countryConfig = $helper->getCountriesConfig($shipment);
         $selectedCombination = $helper->getCombinationByCombinationId($countryConfig->options, $data['shipment']['gls']['combination']);
 
         $serviceValidator = new Zend_Validate_InArray($selectedCombination['addon_services']);
@@ -505,15 +651,16 @@ class SynergeticAgency_Gls_Model_Gls extends Mage_Core_Model_Abstract {
      * businessparcel vs. europarcel
      * business parcel is just allowed for domestic shipment europarcel is just allowed for foreign country shipment
      * @param $data
+     * @param Mage_Sales_Model_Order_Shipment $shipment
      * @return array
      */
-    public function isValidDestinationCountry($data)
+    public function isValidDestinationCountry($data,$shipment)
     {
         $helper = Mage::helper('synergeticagency_gls/validate');
-        $countryConfig = $helper->getCountriesConfig();
+        $countryConfig = $helper->getCountriesConfig($shipment);
         $selectedCombination = $helper->getCombinationByCombinationId($countryConfig->options, $data['shipment']['gls']['combination']);
         $messages = array();
-        if((false === $selectedCombination['domestic'] && true === $helper->isDomestic()) || (false === $selectedCombination['foreign'] && false === $helper->isDomestic())){
+        if((false === $selectedCombination['domestic'] && true === $helper->isDomestic($shipment)) || (false === $selectedCombination['foreign'] && false === $helper->isDomestic($shipment))){
             $messages[0] =  Mage::helper('synergeticagency_gls')->__("The selected product is not allowed for shipments target country");
         }
 
@@ -523,12 +670,13 @@ class SynergeticAgency_Gls_Model_Gls extends Mage_Core_Model_Abstract {
     /**
      * Check if parcels cash on delivery is(are) allowed in respect of given package data and the corresponding configuration
      * @param $data
+     * @param Mage_Sales_Model_Order_Shipment $shipment
      * @return array
      */
-    public function isValidCashService($data)
+    public function isValidCashService($data,$shipment)
     {
         $helper = Mage::helper('synergeticagency_gls/validate');
-        $countryConfig = $helper->getCountriesConfig();
+        $countryConfig = $helper->getCountriesConfig($shipment);
         $selectedCombination = $helper->getCombinationByCombinationId($countryConfig->options, $data['shipment']['gls']['combination']);
         $messages = array();
         foreach($data['shipment']['packages'] AS $package){

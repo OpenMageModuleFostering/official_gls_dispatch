@@ -19,33 +19,24 @@
  * needs please refer to http://www.magento.com for more information.
  *
  * @category   SynergetigAgency
- * @package    SynergeticAgency\Gls\Helper
+ * @package    SynergeticAgency\Gls\Model\Shipment\Parcel
  * @copyright  Copyright (c) 2016 synergetic agency AG (http://agency.synergetic.ag)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
- * Class SynergeticAgency_Gls_Block_Adminhtml_System_Config_Note
+ * GLS shipment job collection
+ *
+ * @category    SynergeticAgency
+ * @package     SynergeticAgency_Gls
+ * @author      PHP WebDevelopment <php.webdevelopment@synergetic.ag>
  */
-class SynergeticAgency_Gls_Block_Adminhtml_System_Config_Note extends Mage_Adminhtml_Block_Abstract
-    implements Varien_Data_Form_Element_Renderer_Interface
-{
-    /**
-     * Template
-     * @var string
-     */
-    protected $_template = 'gls/system/config/note.phtml';
+class SynergeticAgency_Gls_Model_Resource_Shipment_Job_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract {
 
     /**
-     * Render html
-     *
-     * @param Varien_Data_Form_Element_Abstract $fieldset
-     * @return string
+     * constructor for parcels
      */
-    public function render(Varien_Data_Form_Element_Abstract $fieldset)
-    {
-        $this->addData($fieldset->getOriginalData());
-        $this->setData('agency_logo_url',Mage::getDesign()->getSkinUrl('images/gls/gls-logo.png'));
-        return $this->toHtml();
+    protected function _construct() {
+        $this->_init('synergeticagency_gls/shipment_job');
     }
 }

@@ -114,7 +114,7 @@ class SynergeticAgency_GlsConnector_Log
                 error_log("GLS Connector: Logfile: ".$this->getLogFile() . " is Not writable!!!");
             }
         } else {
-            error_log("GLS Connector: logging is NOT activated: " . (Integer)$this->isOn());
+            //error_log("GLS Connector: logging is NOT activated: " . (Integer)$this->isOn());
         }
 	}
 

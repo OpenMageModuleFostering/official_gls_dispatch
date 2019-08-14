@@ -59,11 +59,8 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      * @return bool
      */
     public function isCountryAvailable() {
-        $glsModel = Mage::getModel('synergeticagency_gls/gls');
-        $storeCountry = Mage::getStoreConfig(Mage_Shipping_Model_Shipping::XML_PATH_STORE_COUNTRY_ID, $this->getStore());
-        $destCountry = $this->_getCurrentShipment()->getShippingAddress()->getCountryId();
-        return ($glsModel->isCountryOriginIdAvailable($storeCountry)
-            && ($this->isDomestic() || $glsModel->isDestinationCountryAvailable($storeCountry,$destCountry)));
+        $shipment = $this->_getCurrentShipment();
+        return Mage::helper('synergeticagency_gls/validate')->isCountryAvailable($shipment);
     }
 
     /**
@@ -95,40 +92,13 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      * @return bool
      */
     public function isCombinationSelected($combinationId) {
-        $return = false;
-        switch ($combinationId) {
-            case SynergeticAgency_Gls_Model_Gls::COMB_BUSINESS_PARCEL:
-                if($this->isDomestic() && ($this->isStandardShipping()) && !$this->isParcelshopDelivery() && !$this->isCashService()) {
-                    $return = true;
-                }
-                break;
-            case SynergeticAgency_Gls_Model_Gls::COMB_BUSINESS_PARCEL_GUARANTEED:
-                if($this->isDomestic() && $this->isExpressShipping()) {
-                    $return = true;
-                }
-                break;
-            case SynergeticAgency_Gls_Model_Gls::COMB_BUSINESS_PARCEL_SHOPDELIVERY:
-                if($this->isDomestic() && $this->isParcelshopDelivery()) {
-                    $return = true;
-                }
-                break;
-            case SynergeticAgency_Gls_Model_Gls::COMB_BUSINESS_PARCEL_CASHSERVICE:
-                if($this->isDomestic() && $this->isCashService()) {
-                    $return = true;
-                }
-                break;
-            case SynergeticAgency_Gls_Model_Gls::COMB_EUROBUSINESS_PARCEL:
-                if((!$this->isDomestic() || $this->matchCountry('FI')) && !$this->isParcelshopDelivery() && $this->isForeignShipping()) {
-                    $return = true;
-                }
-                break;
-            case SynergeticAgency_Gls_Model_Gls::COMB_EUROBUSINESS_PARCEL_SHOPDELIVERY:
-                if(!$this->isDomestic() && $this->isParcelshopDelivery()) {
-                    $return = true;
-                }
-                break;
+        $glsModel = Mage::getModel('synergeticagency_gls/gls');
+        $shipment = $this->_getCurrentShipment();
+        $combinationByShipment = $glsModel->getCombinationByShipment($shipment,false);
+        if($combinationId === $combinationByShipment) {
+            return true;
         }
-        return $return;
+        return false;
     }
 
     /**
@@ -140,21 +110,13 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      * @return bool
      */
     public function isServiceSelected($serviceId) {
+        // this function is just an example for the moment
+        // originally it was used for the think green service, but think green is removed from the frontend and as well here
         $return = false;
         switch($serviceId) {
 
         }
         return $return;
-    }
-
-    /**
-     * Returns true, if current shipping method is a GLS "Standard" shipping
-     * Otherwise, this function returns false
-     *
-     * @return bool
-     */
-    public function isStandardShipping() {
-        return $this->_getCurrentShipment()->getOrder()->getShippingMethod() == SynergeticAgency_Gls_Model_Carrier::CODE.'_'.SynergeticAgency_Gls_Model_Carrier::SHIPPING_RATE_STANDARD;
     }
 
     /**
@@ -164,7 +126,8 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      * @return bool
      */
     public function isExpressShipping() {
-        return $this->_getCurrentShipment()->getOrder()->getShippingMethod() == SynergeticAgency_Gls_Model_Carrier::CODE.'_'.SynergeticAgency_Gls_Model_Carrier::SHIPPING_RATE_EXPRESS;
+        $shipment = $this->_getCurrentShipment();
+        return Mage::helper('synergeticagency_gls/validate')->isExpressShipping($shipment);
     }
 
     /**
@@ -174,7 +137,8 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      * @return bool
      */
     public function isForeignShipping() {
-        return $this->_getCurrentShipment()->getOrder()->getShippingMethod() == SynergeticAgency_Gls_Model_Carrier::CODE.'_'.SynergeticAgency_Gls_Model_Carrier::SHIPPING_RATE_FOREIGNCOUNTRIES;
+        $shipment = $this->_getCurrentShipment();
+        return Mage::helper('synergeticagency_gls/validate')->isForeignShipping($shipment);
     }
 
     /**
@@ -185,8 +149,8 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      * @return bool
      */
     public function matchCountry( $countryCode ) {
-        $storeCountry = Mage::getStoreConfig(Mage_Shipping_Model_Shipping::XML_PATH_STORE_COUNTRY_ID, $this->getStore());
-        return strtoupper( $storeCountry ) === strtoupper( $countryCode );
+        $shipment = $this->_getCurrentShipment();
+        return Mage::helper('synergeticagency_gls/validate')->matchCountry($countryCode,$shipment);
     }
 
     /**
@@ -197,8 +161,8 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      * @return bool
      */
     public function isParcelshopDelivery() {
-        $parcelShopId = $this->_getCurrentShipment()->getShippingAddress()->getParcelshopId();
-        return !empty($parcelShopId);
+        $shipment = $this->_getCurrentShipment();
+        return Mage::helper('synergeticagency_gls/validate')->isParcelshopDelivery($shipment);
     }
 
     /**
@@ -209,12 +173,7 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      */
     public function isCashService() {
         $shipment = $this->_getCurrentShipment();
-        if($shipment) {
-            if($shipment->getOrder()->getPayment()->getMethodInstance() instanceof SynergeticAgency_Gls_Model_Glscashondelivery) {
-                return true;
-            }
-        }
-        return false;
+        return Mage::helper('synergeticagency_gls/validate')->isCashService($shipment);
     }
 
     /**
@@ -253,7 +212,8 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      * @return int
      */
     public function getParcelShopCombinationId() {
-        return $this->isDomestic() ? SynergeticAgency_Gls_Model_Gls::COMB_BUSINESS_PARCEL_SHOPDELIVERY : SynergeticAgency_Gls_Model_Gls::COMB_EUROBUSINESS_PARCEL_SHOPDELIVERY;
+        $shipment = $this->_getCurrentShipment();
+        return Mage::helper('synergeticagency_gls/validate')->getParcelShopCombinationId($shipment);
     }
 
     /**
@@ -293,15 +253,7 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      */
     public function getCountriesJson() {
         $shipment = $this->_getCurrentShipment();
-        $jsonData = '{}';
-        if($shipment) {
-            $storeCountry = Mage::getStoreConfig(Mage_Shipping_Model_Shipping::XML_PATH_STORE_COUNTRY_ID, $this->getStore());
-            $glsCountry = Mage::getModel('synergeticagency_gls/country')->load($storeCountry);
-            if($glsCountry->getId()) {
-                $jsonData = Mage::helper('core')->jsonEncode($glsCountry->getData());
-            }
-        }
-        return $jsonData;
+        return Mage::helper('synergeticagency_gls/validate')->getCountriesJson($shipment);
     }
 
     /**
@@ -312,19 +264,7 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
     */
     public function getJsonConfig() {
         $shipment = $this->_getCurrentShipment();
-        $jsonData = '{}';
-        if($shipment) {
-            $storeCountry = Mage::getStoreConfig(Mage_Shipping_Model_Shipping::XML_PATH_STORE_COUNTRY_ID,
-                $this->getStore());
-            /** @var Zend_Config_Json $jsonConfig */
-            $jsonConfig = Mage::getModel('synergeticagency_gls/jsonimport')->getCountry($storeCountry);
-            if($jsonConfig) {
-                $writer = new Zend_Config_Writer_Json();
-                $writer->setConfig($jsonConfig);
-                $jsonData = $writer->render();
-            }
-        }
-        return $jsonData;
+        return Mage::helper('synergeticagency_gls/validate')->getJsonConfig($shipment);
     }
 
     /**
@@ -333,7 +273,8 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      * @return string
      */
     public function getTargetCountry() {
-        return $this->_getCurrentShipment()->getShippingAddress()->getCountryId();;
+        $shipment = $this->_getCurrentShipment();
+        return Mage::helper('synergeticagency_gls/validate')->getTargetCountry($shipment);
     }
 
     /**
@@ -343,13 +284,7 @@ class SynergeticAgency_Gls_Block_Adminhtml_Sales_Order_Shipment_Create_Gls exten
      */
     public function isDomestic() {
         $shipment = $this->_getCurrentShipment();
-        $return = null;
-        if($shipment) {
-            $storeCountry = Mage::getStoreConfig(Mage_Shipping_Model_Shipping::XML_PATH_STORE_COUNTRY_ID, $this->getStore());
-            $destCountry = $shipment->getShippingAddress()->getCountryId();
-            $return = $storeCountry == $destCountry;
-        }
-        return $return;
+        return Mage::helper('synergeticagency_gls/validate')->isDomestic($shipment);
     }
 
     /**

@@ -26,7 +26,7 @@
             <tr class="option-row">
                 <td><input class="input-text shipping-weight" type="text" name="shipment[packages][package_<?php echo $i;?>][weight]" value="<?php echo $parcel->getWeight() ?>" /></td>
                 <td>
-                    <input class="input-text cash-service <? echo ($this->isCashService() == true) ? '' : 'disabled'; ?>" <? echo ($this->isCashService() == true) ? '' : 'disabled'; ?> style=" <? echo ($this->isCashService() == true) ? '' : 'display:none'; ?>" type="text" name="shipment[packages][package_<?php echo  $i;?>][cashservice]" value="<?php echo $this->getStore()->roundPrice($parcel->getCashservice()) ?>" />
+                    <input class="input-text cash-service <?php echo ($this->isCashService() == true) ? '' : 'disabled'; ?>" <?php echo ($this->isCashService() == true) ? '' : 'disabled'; ?> style=" <?php echo ($this->isCashService() == true) ? '' : 'display:none'; ?>" type="text" name="shipment[packages][package_<?php echo  $i;?>][cashservice]" value="<?php echo $this->getStore()->roundPrice($parcel->getCashservice()) ?>" />
                 </td>
                 <td class="gls-controls"><a class="addParcel" href=""><img src="<?php echo $this->getSkinUrl('images/icon_btn_add.gif');?>" /></a></td>
             </tr>
@@ -36,7 +36,7 @@
     <tr class="option-row">
         <td><input class="input-text shipping-weight" type="text" name="shipment[packages][package_0][weight]" value="<?php echo $this->getWeight() ?>" /></td>
         <td>
-            <input class="input-text cash-service <? echo ($this->isCashService() == true) ? '' : 'disabled'; ?>"  <? echo ($this->isCashService() == true) ? '' : 'disabled'; ?> style=" <? echo ($this->isCashService() == true) ? '' : 'display:none'; ?>" type="text" name="shipment[packages][package_0][cashservice]" value="<?php echo $this->getCashAmount() ?>" />
+            <input class="input-text cash-service <?php echo ($this->isCashService() == true) ? '' : 'disabled'; ?>"  <?php echo ($this->isCashService() == true) ? '' : 'disabled'; ?> style=" <?php echo ($this->isCashService() == true) ? '' : 'display:none'; ?>" type="text" name="shipment[packages][package_0][cashservice]" value="<?php echo $this->getCashAmount() ?>" />
         </td>
         <td class="gls-controls"><a class="addParcel" href=""><img src="<?php echo $this->getSkinUrl('images/icon_btn_add.gif');?>" /></a></td>
     </tr>

@@ -73,7 +73,7 @@ class SynergeticAgency_Gls_Model_Resource_Service_Collection extends Varien_Data
                     }
                 }
                 if($add) {
-                    $item = Mage::getModel('synergeticagency_gls/service');;
+                    $item = Mage::getModel('synergeticagency_gls/service');
                     $item->setData($service->toArray());
                     $this->addItem($item);
                 }

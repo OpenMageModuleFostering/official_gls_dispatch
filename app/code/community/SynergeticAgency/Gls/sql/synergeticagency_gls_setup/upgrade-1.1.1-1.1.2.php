@@ -19,33 +19,20 @@
  * needs please refer to http://www.magento.com for more information.
  *
  * @category   SynergetigAgency
- * @package    SynergeticAgency\Gls\Helper
+ * @package    SynergeticAgency\Gls\sql\synergeticagency_gls_setup
  * @copyright  Copyright (c) 2016 synergetic agency AG (http://agency.synergetic.ag)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-/**
- * Class SynergeticAgency_Gls_Block_Adminhtml_System_Config_Note
- */
-class SynergeticAgency_Gls_Block_Adminhtml_System_Config_Note extends Mage_Adminhtml_Block_Abstract
-    implements Varien_Data_Form_Element_Renderer_Interface
-{
-    /**
-     * Template
-     * @var string
-     */
-    protected $_template = 'gls/system/config/note.phtml';
+/* @var $installer Mage_Core_Model_Resource_Setup */
+$installer = $this;
+$installer->startSetup();
 
-    /**
-     * Render html
-     *
-     * @param Varien_Data_Form_Element_Abstract $fieldset
-     * @return string
-     */
-    public function render(Varien_Data_Form_Element_Abstract $fieldset)
-    {
-        $this->addData($fieldset->getOriginalData());
-        $this->setData('agency_logo_url',Mage::getDesign()->getSkinUrl('images/gls/gls-logo.png'));
-        return $this->toHtml();
-    }
-}
+$installer->getConnection()->addColumn($installer->getTable('synergeticagency_gls/shipment_job'),'error_items',array(
+    'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+    'nullable'  => true,
+    'default'   => null,
+    'comment'   => 'Error Items Order Increment ID'
+));
+
+$installer->endSetup();
