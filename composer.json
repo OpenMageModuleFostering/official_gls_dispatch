@@ -1,7 +1,7 @@
 {
-    "name": "OpenMageModuleFostering\/Official_GLS_Dispatch",
+    "name": "openmage-module-fostering\/official_gls_dispatch",
     "type": "magento-module",
-    "license": "Open-Software-License-(OSL)",
+    "license": "OSL-3.0",
     "homepage": "",
     "description": "Easily integrate the most common GLS dispatch services and the GLS ParcelShop finder into your shop.",
     "authors": [
