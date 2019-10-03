@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/Official_GLS_Dispatch",
+    "name": "OpenMageModuleFostering\/Official_GLS_Dispatch",
     "type": "magento-module",
     "license": "Open-Software-License-(OSL)",
     "homepage": "",
     "description": "Easily integrate the most common GLS dispatch services and the GLS ParcelShop finder into your shop.",
     "authors": [
-    {
-        "name": "synergetic PHP Webdevelopment",
-        "email": "phpwebdevelopment@synag.de"
-    }
-],
+        {
+            "name": "synergetic PHP Webdevelopment",
+            "email": "phpwebdevelopment@synag.de"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
